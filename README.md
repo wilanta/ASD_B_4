@@ -4,9 +4,9 @@ Aplikasi berbasis CLI Python untuk pemesanan tiket bioskop dengan sistem antrean
 
 ## Team & Role
 
-**J0403251040** M. Lutfi Ramadhan Warendra (Engineer, Advisor)
-**J0403251070** Fateeh Falah Hendarto (Engineer, Advisor)
-**J0403251098** Wildhan Dzikrihantara (Project Manager, Engineer)
+- **J0403251040** M. Lutfi Ramadhan Warendra (Engineer, Advisor),
+- **J0403251070** Fateeh Falah Hendarto (Engineer, Advisor)
+- **J0403251098** Wildhan Dzikrihantara (Project Manager, Engineer)
 
 ## Dependency
 
@@ -15,5 +15,6 @@ Aplikasi berbasis CLI Python untuk pemesanan tiket bioskop dengan sistem antrean
 ## How to run
 
 1. clone this repo **git clone https://github.com/wilanta/antrian-tiket-bioskop** or download the zip
-2. download dependencies that listed above or see at requirements.txt by **pip install -r requirements.txt**
-3. run main.py file **python main.py** using cmd or powershell
+2. create virtual enviroment **python -m venv venv**
+3. download dependencies that listed above or see at requirements.txt by **pip install -r requirements.txt**
+4. run main.py file **python main.py** using cmd or powershell
