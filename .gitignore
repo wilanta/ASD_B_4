@@ -1,2 +1,5 @@
 venv/
-CRUD/operations/__pycache__
+__pycache__/
+*.pyc
+CRUD/data/*
+!CRUD/data/.gitkeep
