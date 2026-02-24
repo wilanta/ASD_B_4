@@ -29,6 +29,10 @@ from CRUD.operations.film import showFilm, addFilm, updateFilm, deleteFilm
 # invoice
 from CRUD.operations.invoice import invoice
 
+# utillities & libraries
+# from CRUD.utils.nodeGenerator import generateNode
+from CRUD.utils.idGenerator import generateID
+from CRUD.utils.dataOps import getAllData, searchData, updateData
 
 # ------------------------------
 # Nama fungsi: pilihFilm
