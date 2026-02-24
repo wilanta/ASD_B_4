@@ -10,6 +10,9 @@ Fungsi/fitur:
 ==========================================================
 """
 
+# import libraries
+import os
+
 # ------------------------------
 # Nama fungsi: getAllData
 # Penjelasan fungsi : Mengembalikan seluruh isi data berupa dictionary.
@@ -32,9 +35,14 @@ def getAllData(data_name: str) -> dict:
     # Menampung data dari database
     data = {}
     
+    # Mengambil dan menentukan path penyimpanan data
+    module_dir = os.path.dirname(__file__)
+    file_path = os.path.join(module_dir, f"../data/{data_name}.txt")
+    file_path = os.path.abspath(file_path)
+    
     # Membuka file data berdasarkan data_name-nya untuk di-read
     try:
-        with open(f"../data/{data_name}.txt", "r", encoding="utf-8") as d:
+        with open(file_path, "r", encoding="utf-8") as d:
             # Menambah dari satu per satu dari database ke dictionary
             for row in d:
                 # Bersihkan dari \n dan sisihkan data per field
@@ -166,11 +174,16 @@ def updateData(data_dict: dict, data_name: str):
     if data_name.lower() not in ["data_film", "log_pemesanan"]:
         raise ValueError("HANYA BOLEH DIISI DENGAN 'data_film' ATAU 'log_pemesanan'")
     
+    # Mengambil dan menentukan path penyimpanan data
+    module_dir = os.path.dirname(__file__)
+    file_path = os.path.join(module_dir, f"../data/{data_name}.txt")
+    file_path = os.path.abspath(file_path)
+    
     # Memasukan data dari dict ke database
     try:
         # Memastikan dalam database yang tepat
         if data_name.lower() == "data_film":
-            with open(f"../data/{data_name}.txt", "w", encoding="utf-8") as d:
+            with open(file_path, "w", encoding="utf-8") as d:
                 for film_id in data_dict.keys():
                     # Menyimpan data dari dictionary untuk disimpan ke database
                     judul_film = data_dict[film_id]["judul_film"]
@@ -179,7 +192,7 @@ def updateData(data_dict: dict, data_name: str):
                     # Menambahkan data ke database
                     d.write(f"{film_id},{judul_film},{kuota_penonton}\n")
         elif data_name.lower() == "log_pemesanan":
-            with open(f"../data/{data_name}.txt", "w", encoding="utf-8") as d:
+            with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():
                     # Menyimpan data dari dictionary untuk disimpan ke database
                     nama = data_dict[log_id]["nama"]
