@@ -12,9 +12,23 @@ Fungsi/fitur:
 
 """
 
-# Import features yang akan digunakan di main menu
-from CRUD.operations.queue import enqueue as enqueue
-from CRUD.operations.queue import dequeue as dequeue
+# Import features yang akan digunakan di main 
+
+# queue
+# from CRUD.operations.queue import Queue
+
+# linked list
+# from CRUD.operations.linkedList import LinkedList
+
+# order
+from CRUD.operations.order import orderKursi, storeOrder, resetOrder
+
+# film
+from CRUD.operations.film import showFilm, addFilm, updateFilm, deleteFilm
+
+# invoice
+from CRUD.operations.invoice import invoice
+
 
 # ------------------------------
 # Nama fungsi: pilihFilm
