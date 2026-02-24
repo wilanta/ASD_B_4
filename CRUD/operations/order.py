@@ -26,32 +26,43 @@ from CRUD.utils.dataOps import getAllData
 
 def orderKursi(kursi_id='ABC123'):  # kursi_id PLACEHOLDER
     "Order Kursi"
-    data = getAllData('data_film')
-    max_kursi_per_cust = 4
-    while True:
-        try:
-            user_ticket = int(input("Masukkan jumlah tiket yang dipesan: "))
-            if user_ticket > max_kursi_per_cust or user_ticket < 0:
-                print("Hanya bisa 1-4 tiket!")
-            elif user_ticket > int(data[kursi_id]['kuota_penonton']):
-                print(
-                    f"Hanya tersisa {data[kursi_id]['kuota_penonton']} kuota!")
-        except ValueError:
-            print("Masukkan bilangan yang valid!")
-        break
+    data = getAllData('data_film')  # Fetch
+    max_kursi_per_cust = 4  # Constant
+
+    # Menu
     print("=== Kursi Tersedia ===")
     available_seats = [
         "K" + str(i) for i in range(1, int(data[kursi_id]['kuota_penonton']))]
     print(available_seats)
+
+    # Loop user input
+    while True:
+        try:
+            user_ticket = int(input("Masukkan jumlah tiket yang dipesan: "))
+            # If not between 1-4
+            if user_ticket > max_kursi_per_cust or user_ticket < 0:
+                print("Hanya bisa 1-4 tiket!")
+            # Else if over the quota
+            elif user_ticket > int(data[kursi_id]['kuota_penonton']):
+                print(
+                    f"Hanya tersisa {data[kursi_id]['kuota_penonton']} kuota!")
+        # If not int
+        except ValueError:
+            print("Masukkan bilangan yang valid!")
+        break  # exit loop
+
+    # User select seats
     for _ in range(user_ticket):
         select = input("Pilih Kursi: ").upper().strip()
-        selected_seats = []
+        selected_seats = []  # List to hold user's choice(s)
+        # Transfer seat from available seat list if true
+        # Print error if false
         if select in available_seats:
             available_seats.remove(select)
             selected_seats.append(select)
         else:
             print("Kursi tidak valid / sudah terpakai.")
-    return user_ticket, selected_seats
+    return user_ticket, selected_seats  # Return ticket amount and selected seats
 
 
 orderKursi()
