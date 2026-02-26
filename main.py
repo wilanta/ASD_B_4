@@ -109,7 +109,7 @@ def main():
         case "2":
             showFilm()
         case "3":
-            tambahFilm()
+            addFilm()
         case "0":
             print("Program dihentikan.")
         case _:
