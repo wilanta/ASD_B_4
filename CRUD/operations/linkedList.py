@@ -13,7 +13,11 @@ Fungsi/fitur:
 """
 
 # Inisialisasi variabel untuk linked list
-ticket_head = None
+class Node:
+    "Node untuk Linked List"
+    def __init__(self, data):
+        self.data = data
+        self.next = None
 
 # ------------------------------
 # Nama fungsi: addTicket
@@ -21,6 +25,7 @@ ticket_head = None
 # ------------------------------
 def addTicket(nama, jumlah, kursi_list):
     pass
+
 # ------------------------------
 # Nama fungsi: showTickets
 # Penjelasan fungsi : Untuk menampilkan semua ticket yang berada dalam linked list.
