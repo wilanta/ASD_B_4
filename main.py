@@ -34,12 +34,50 @@ from CRUD.operations.invoice import invoice
 from CRUD.utils.idGenerator import generateID
 from CRUD.utils.dataOps import getAllData, searchData, updateData
 
+import pandas as pd
+
 # ------------------------------
 # Nama fungsi: pilihFilm
 # Penjelasan fungsi : Untuk memilih film yang akan dimanage sistem anterannya.
 # ------------------------------
-def pilihFilm():
-    pass
+def pilihFilm() -> str | None:
+    # Menampilkan header
+    print("==== PILIH FILM =====")
+    
+    # Mengambil data_film dari database
+    data_film = getAllData("data_film")
+    
+    # Memasukan data_film ke data frame untuk ditampilkan
+    df = pd.DataFrame(data_film).T
+    
+    # Memodifikasi data frame
+    df.drop(columns=["kuota_penonton"], inplace=True) # Menghilangkan kuota_penonton dari data frame
+    df.rename(columns={"judul_film": "JUDUL FILM"}, inplace=True) # Mengganti title judul_film -> JUDUL FILM
+    df.insert(0, "NO", range(1, len(df)+1)) # Menambah urutan angka ke kolom 1 data frame
+
+    # Menampilkan data frame
+    print(df.to_string(index=False))
+    
+    # Meminta pilihan judul film
+    pilih = input("\nPilih Nomor : ")
+    
+    # Validasi tipe input, jika tidak berupa angka tanyakan kembali
+    while not pilih.isdigit():
+        print("Input harus berupa angka.")
+        pilih = input("\nPilih Nomor : ")
+        
+    # Mengubah input plih ke integer
+    pilih = int(pilih)
+    
+    # Validasi urutan input
+    if 1 <= pilih <= len(data_film):
+        # Ambil ID sesuai urutan
+        film_id = list(data_film.keys())[pilih - 1]
+        
+        return film_id
+    else:
+        print("Nomor urut tidak valid.")
+        return
 
 # ------------------------------
 # Nama fungsi: sistemAntrean
