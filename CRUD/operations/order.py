@@ -12,60 +12,47 @@ Fungsi/fitur:
 ==========================================================
 """
 
-# Dependencies
-from rich import print
-
-# Utils
-from CRUD.utils.dataOps import getAllData
-
 # ------------------------------
 # Nama fungsi: orderKursi
 # Penjelasan fungsi : Untuk memilihkan kursi kosong untuk customer secara bebas.
 # ------------------------------
 
 
-def orderKursi(kursi_id='ABC123'):  # kursi_id PLACEHOLDER
+def orderKursi(available_seats_list: list):  # kursi_id PLACEHOLDER
     "Order Kursi"
-    data = getAllData('data_film')  # Fetch
     max_kursi_per_cust = 4  # Constant
-
-    # Menu
-    print("=== Kursi Tersedia ===")
-    available_seats = [
-        "K" + str(i) for i in range(1, int(data[kursi_id]['kuota_penonton']))]
-    print(available_seats)
 
     # Loop user input
     while True:
+        # Input validation (must be int)
         try:
             user_ticket = int(input("Masukkan jumlah tiket yang dipesan: "))
             # If not between 1-4
             if user_ticket > max_kursi_per_cust or user_ticket < 0:
                 print("Hanya bisa 1-4 tiket!")
             # Else if over the quota
-            elif user_ticket > int(data[kursi_id]['kuota_penonton']):
+            elif user_ticket > len(available_seats_list):
                 print(
-                    f"Hanya tersisa {data[kursi_id]['kuota_penonton']} kuota!")
-        # If not int
+                    f"Hanya tersisa {len(available_seats_list)} kuota!")
         except ValueError:
             print("Masukkan bilangan yang valid!")
         break  # exit loop
 
+    # Menu
+    print("=== Kursi Tersedia ===")
+    print(available_seats_list)
     # User select seats
-    for _ in range(user_ticket):
-        select = input("Pilih Kursi: ").upper().strip()
+    for i in range(user_ticket):
+        select = input(f"Pilih Kursi Tiket ke-{i+1}: ").upper().strip()
         selected_seats = []  # List to hold user's choice(s)
         # Transfer seat from available seat list if true
         # Print error if false
-        if select in available_seats:
-            available_seats.remove(select)
+        if select in available_seats_list:
+            available_seats_list.remove(select)
             selected_seats.append(select)
         else:
             print("Kursi tidak valid / sudah terpakai.")
     return user_ticket, selected_seats  # Return ticket amount and selected seats
-
-
-orderKursi()
 
 # ------------------------------
 # Nama fungsi: storeOrder
