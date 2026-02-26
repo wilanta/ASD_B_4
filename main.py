@@ -91,7 +91,29 @@ def sistemAntrean():
 # Penjelasan fungsi : Untuk tampilan dan kontrol main menu.
 # ------------------------------
 def main():
-    pass
+    #Menampilkan pilihan
+    print("==== BIOSKOP CACB ====")
+    print("1. Sistem Informasi Antrean")
+    print("2. Daftar Film")
+    print("3. Tambah Film")
+    print("0. Keluar")
+    print()
+
+    #Meminta masukan pilihan dari user
+    pilihan = input("Pilih : ")
+
+    #Mengecek nilai dari variabel 'pilihan'
+    match pilihan:
+        case "1":
+            pilihFilm()
+        case "2":
+            showFilm()
+        case "3":
+            tambahFilm()
+        case "0":
+            print("Program dihentikan.")
+        case _:
+            print("Pilihan tidak valid!\n")
 
 # Untuk menjalankan fungsi main secara langsung
 if __name__ == "__main__":
