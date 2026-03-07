@@ -32,8 +32,7 @@ def orderKursi(available_seats_list: list):  # kursi_id PLACEHOLDER
                 print("Hanya bisa 1-4 tiket!")
             # Else if over the quota
             elif user_ticket > len(available_seats_list):
-                print(
-                    f"Hanya tersisa {len(available_seats_list)} kuota!")
+                print(f"Hanya tersisa {len(available_seats_list)} kuota!")
         except ValueError:
             print("Masukkan bilangan yang valid!")
         break  # exit loop
@@ -43,7 +42,7 @@ def orderKursi(available_seats_list: list):  # kursi_id PLACEHOLDER
     print(available_seats_list)
     # User select seats
     for i in range(user_ticket):
-        select = input(f"Pilih Kursi Tiket ke-{i+1}: ").upper().strip()
+        select = input(f"Pilih Kursi Tiket ke-{i + 1}: ").upper().strip()
         selected_seats = []  # List to hold user's choice(s)
         # Transfer seat from available seat list if true
         # Print error if false
@@ -54,21 +53,10 @@ def orderKursi(available_seats_list: list):  # kursi_id PLACEHOLDER
             print("Kursi tidak valid / sudah terpakai.")
     return user_ticket, selected_seats  # Return ticket amount and selected seats
 
-# ------------------------------
-# Nama fungsi: storeOrder
-# Penjelasan fungsi : Untuk menyimpan pemesanan customer yang telah dilayani dan memilih kursi
-# ke log_pemesanan.txt dengan format log_id,nama,jumlah_ticket,urutan_antrean,judul.
-# ------------------------------
-
-
-def storeOrder():
-    pass
 
 # ------------------------------
 # Nama fungsi: resetOrder
 # Penjelasan fungsi : Untuk mereset sistem antrean menjadi 0 antrean kembali.
 # ------------------------------
-
-
 def resetOrder():
     pass
