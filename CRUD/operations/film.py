@@ -12,26 +12,37 @@ Fungsi/fitur:
 ==========================================================
 """
 
+
 # ------------------------------
 # Nama fungsi: showFilm
 # Penjelasan fungsi : Untuk menampilkan daftar film.
 # ------------------------------
-def showFilm():
-    pass
+def showFilm() -> str:
+    """
+    Menampilkan daftar film yang tersedia
+
+    Returns:
+        str: film_id yang dipilih oleh user
+    """
+    film_id = ""
+    return film_id
+
 
 # ------------------------------
 # Nama fungsi: updateFilm
 # Penjelasan fungsi : Untuk untuk menganti judul film dan kuota penonton film serta menyimpannya ke file .txt.
 # ------------------------------
-def updateFilm():
+def updateFilm(film_id):
     pass
+
 
 # ------------------------------
 # Nama fungsi: deleteFilm
 # Penjelasan fungsi : Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
 # ------------------------------
-def deleteFilm():
+def deleteFilm(film_id):
     pass
+
 
 # ------------------------------
 # Nama fungsi: addFilm
