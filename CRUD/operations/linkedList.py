@@ -30,6 +30,13 @@ class LinkedList:
         pass
 
     # ------------------------------
+    # Nama fungsi: isEmpty
+    # Penjelasan fungsi : Untuk mengecek apakah linked list kosong atau tidak.
+    # ------------------------------
+    def isEmpty(self):
+        return self.head is None
+
+    # ------------------------------
     # Nama fungsi: showTickets
     # Penjelasan fungsi : Untuk menampilkan semua ticket yang berada dalam linked list.
     # ------------------------------
