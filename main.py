@@ -358,7 +358,10 @@ def main():
                 film_id = pilihFilm()
 
                 # Memanggil fungsi sistem antrean
-                sistemAntrean(film_id)
+                if film_id:
+                    sistemAntrean(film_id)
+                else:
+                    print("=> Kembali ke menu utama.\n")
             case "2":
                 # film_id = showFilm()
 
