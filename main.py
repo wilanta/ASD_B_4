@@ -246,7 +246,7 @@ def sistemAntrean(film_id: str):
                 q.showQueue()
 
             case "4":  # Lihat Data Pemesanan
-                ll.showTickets
+                ll.showTickets()
 
             case "5":  # Batalkan Antrean
                 # Jika antrean kosong, maka tidak ada data yang bisa dibatalkan
@@ -273,6 +273,8 @@ def sistemAntrean(film_id: str):
                 # Hapus customer dari antrean
                 q.cancelQueue(nama)
 
+                print("Customer berhasil dibatalkan!")
+
             case "6":  # Hapus Data Pemesanan
                 # Jika data pemesanan kosong, maka tidak ada data yang bisa dibatalkan
                 if ll.isEmpty():
@@ -296,15 +298,25 @@ def sistemAntrean(film_id: str):
                     nama = input("Nama customer yang akan dibatalkan : ").strip()
 
                 # Hapus customer dari node linked list data pemesanan dan field log_pemesanan
-                ll.deleteTicket(nama)
+                # Tambahkan kembali tiket dan kursi tersedia
+                refunded_ticket, refunded_seat = ll.deleteTicket(nama)
+                available_ticket += refunded_ticket
 
-                # Tambahkan kembali tiket tersedia
-                available_ticket += 1
+                # Mengandung function untuk sort kursi
+                # Karena kalau langsung di-extend, akan menjadi berantakan
+                available_seat.extend(refunded_seat)  # Tambah kursi yang dipesan ke available seat
+                available_seat.sort(key=lambda x: int(''.join(filter(str.isdigit, x))))  # Sort
+                # Code di atas harusnya bisa juga selain format 'K1' dll.
 
             case "7":  # Cari Data Pemesanan
+                # Jika data pemesanan kosong, keluar dari search
+                if ll.isEmpty():
+                    print("Data pemesanan kosong, tidak ada data yang bisa dicari!")
+                    continue
+
                 # Meminta inputan nama customer dari user
                 nama = input(
-                    "Nama customer yang akan dibatalkan (Enter untuk kembali): "
+                    "Nama customer yang akan dicari (Enter untuk kembali): "
                 ).strip()
 
                 # Jika nama kosong, kembali ke menu
@@ -316,10 +328,10 @@ def sistemAntrean(film_id: str):
                     print(
                         "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
                     )
-                    nama = input("Nama customer yang akan dibatalkan : ").strip()
+                    nama = input("Nama customer yang akan dicari : ").strip()
 
-                    # Cari data di node linked list pemesanan
-                    ll.searchTicket(nama)
+                # Cari data di node linked list pemesanan
+                ll.searchTicket(nama)
 
             case "8":  # Reset Antrean dan Pemesanan
                 # Reset Antrean dan Pemesanan

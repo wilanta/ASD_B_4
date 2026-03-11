@@ -7,8 +7,7 @@ dan menyimpan pemesanan ke log_antrean.txt.
 Kontributor : Fateeh Falah Hendarto
 Fungsi/fitur:
 1. orderKursi
-2. storeOrder
-3. resetOrder
+2. resetOrder
 ==========================================================
 """
 
@@ -19,7 +18,17 @@ Fungsi/fitur:
 
 
 def orderKursi(user_ticket: int, available_seats_list: list):
-    "Order Kursi"
+    """
+    Order Kursi
+    
+    Args:
+        user_ticket (int) : Jumlah tiket yang diminta customer
+        available_seats_list (list) : List kursi yang tersedia
+
+    Return:
+        user_ticket (int) : Jumlah tiket customer
+        selected_seats (list) : Kursi yang dipilih
+    """
 
     # Menu
     print("=== Kursi Tersedia ===")
@@ -36,8 +45,7 @@ def orderKursi(user_ticket: int, available_seats_list: list):
                 selected_seats.append(select)
                 break
             # Print error if false
-            else:
-                print("Kursi tidak valid / sudah terpakai.")
+            print("Kursi tidak valid / sudah terpakai.")
     return user_ticket, selected_seats  # Return ticket amount and selected seats
 
 
