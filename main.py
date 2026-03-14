@@ -370,7 +370,7 @@ def main():
 
         # Mengecek nilai dari variabel 'pilihan'
         match pilihan:
-            case "1":
+            case "1":  # Sistem Antrean
                 # Memanggil pilihFilm untuk memilih film yang akan dioperasikan antreannya
                 film_id = pilihFilm()
 
@@ -379,8 +379,16 @@ def main():
                     sistemAntrean(film_id)
                 else:
                     print("=> Kembali ke menu utama.\n")
-            case "2":
+
+            case "2":  # Show film
                 # film_id = showFilm()
+
+                # Film_id validator
+                if film_id is None:
+                    print(
+                        "Invalid input! Pastikan nomor yang diinputkan benar dan berada dalam rentang"
+                    )
+                    continue
 
                 print("\nPilih Operasi : ")
                 print("1. Update")
@@ -390,23 +398,61 @@ def main():
                 pilihan = input("\nPilih : ")
 
                 match pilihan:
-                    case "1":
-                        # updateFilm(film_id)
-                        pass
-                    case "2":
+                    case "1":  # Update Film
+                        # Title ubah film
+                        print("==== Ubah Film ====")
+                        print("Kosongkan isian jika tidak ingin mengganti isi data")
+
+                        # Input data film
+                        judul = input("Judul \t\t: ").strip()
+                        kuota_penonton = input("Kuota Penonton \t: ").strip()
+
+                        # Validasi kuota penonton harus berupa angka
+                        while kuota_penonton and not kuota_penonton.isdigit():
+                            print("Kuota penonton harus berupa angka!")
+                            kuota_penonton = input("\nKuota Penonton \t: ")
+
+                        # Ubah data film di database
+                        # updateFilm(judul_film=judul, kuota_penonton=kuota_penonton, film_id=film_id)
+
+                    case "2":  # Delete Film
                         # deleteFilm(film_id)
                         pass
-                    case "0":
+
+                    case "0":  # Kembali ke menu utama
                         print("Kembali ke menu utama.")
                         continue
-                    case _:
+
+                    case _:  # Pilihan tidak valid
                         print("Pilihan tidak valid!")
-            case "3":
-                addFilm()
-            case "0":
+
+            case "3":  # Tambah Film
+                # Title tambah film
+                print("==== Tambah Film ====")
+                print("Kosongkan isian untuk membatalkan penambahan film")
+
+                # Input data film
+                judul = input("Judul \t\t: ")
+                kuota_penonton = input("Kuota Penonton \t: ")
+
+                # Validasi input
+                if judul == "" or kuota_penonton == "":
+                    print("Isian data kosong! Penambahan film dibatalkan.")
+                    return
+
+                # Validasi kuota penonton harus berupa angka
+                while not kuota_penonton.isdigit():
+                    print("Kuota penonton harus berupa angka!")
+                    kuota_penonton = input("\nKuota Penonton \t: ")
+
+                # Tambahkan film baru ke database
+                # addFilm(judul, int(kuota_penonton))
+
+            case "0":  # Kembali ke menu utama
                 print("Program dihentikan.")
                 break
-            case _:
+
+            case _:  # Pilihan tidak valid
                 print("Pilihan tidak valid!\n")
 
 
