@@ -21,19 +21,10 @@ from CRUD.utils.dataOps import getAllData, updateData
 # Nama fungsi: showFilm
 # Penjelasan fungsi : Untuk menampilkan daftar film.
 # ------------------------------
+
 def showFilm() -> str:
     """
     Menampilkan daftar film yang tersedia
-<<<<<<< HEAD
-=======
-
-    Returns:
-        str: film_id yang dipilih oleh user
-    """
-    film_id = ""
-    return film_id
-
->>>>>>> 43135dd80e0b72360efd16d005fd44f7620c5595
 
     Returns:
         str: film_id yang dipilih oleh user
@@ -67,11 +58,12 @@ def showFilm() -> str:
         return film_ids[int(pilih) - 1]
     else:
         return
+
 # ------------------------------
 # Nama fungsi: updateFilm
 # Penjelasan fungsi : Untuk untuk menganti judul film dan kuota penonton film serta menyimpannya ke file .txt.
 # ------------------------------
-<<<<<<< HEAD
+
 def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
     # Mengambil data dari database agar data lainnya tidak terhapus
     data_film = getAllData("data_film")
@@ -93,18 +85,12 @@ def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
 
     # Success message
     print("Film berhasil diupdate!")
-=======
-def updateFilm(film_id):
-    pass
->>>>>>> 43135dd80e0b72360efd16d005fd44f7620c5595
-
-
 # ------------------------------
 # Nama fungsi: deleteFilm
 # Penjelasan fungsi : Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
 # ------------------------------
+
 def deleteFilm(film_id):
-<<<<<<< HEAD
     # Ambil data dari database
     data_film = getAllData("data_film")
 
@@ -119,16 +105,12 @@ def deleteFilm(film_id):
         updateData(data_dict=data_film, data_name="data_film")
     else:
         print("Film gagal dihapus!")
-=======
-    pass
->>>>>>> 43135dd80e0b72360efd16d005fd44f7620c5595
-
 
 # ------------------------------
 # Nama fungsi: addFilm
 # Penjelasan fungsi : Untuk menambahkan film ke daftar film serta menyimpannya ke file data_film.txt.
 # ------------------------------
-<<<<<<< HEAD
+
 def addFilm(judul: str, kuota_penonton: int):
     		# Mengambil data dari database agar data baru tidak menimpa data lama
     data_film = getAllData("data_film")
@@ -144,8 +126,3 @@ def addFilm(judul: str, kuota_penonton: int):
 
     # Success message
     print("Film berhasil ditambahkan!")
-    
-=======
-def addFilm():
-    pass
->>>>>>> 43135dd80e0b72360efd16d005fd44f7620c5595

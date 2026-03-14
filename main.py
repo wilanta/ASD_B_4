@@ -381,7 +381,7 @@ def main():
                     print("=> Kembali ke menu utama.\n")
 
             case "2":  # Show film
-                # film_id = showFilm()
+                film_id = showFilm()
 
                 # Film_id validator
                 if film_id is None:
@@ -413,11 +413,10 @@ def main():
                             kuota_penonton = input("\nKuota Penonton \t: ")
 
                         # Ubah data film di database
-                        # updateFilm(judul_film=judul, kuota_penonton=kuota_penonton, film_id=film_id)
+                        updateFilm(judul_film=judul, kuota_penonton=kuota_penonton, film_id=film_id)
 
                     case "2":  # Delete Film
-                        # deleteFilm(film_id)
-                        pass
+                        deleteFilm(film_id)
 
                     case "0":  # Kembali ke menu utama
                         print("Kembali ke menu utama.")
@@ -446,7 +445,7 @@ def main():
                     kuota_penonton = input("\nKuota Penonton \t: ")
 
                 # Tambahkan film baru ke database
-                # addFilm(judul, int(kuota_penonton))
+                addFilm(judul, int(kuota_penonton))
 
             case "0":  # Kembali ke menu utama
                 print("Program dihentikan.")
