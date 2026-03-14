@@ -148,7 +148,7 @@ def sistemAntrean(film_id: str):
                     # Jika user memasukan inputan yang tidak tepat
                     while (
                         not isinstance(nama_penonton, str)
-                        or not nama_penonton.isalpha()
+                        or not nama_penonton.strip().replace(" ", "").isalpha()
                     ):
                         print(
                             "Nama penonton harus berupa huruf dan tidak boleh berupa simbol."
@@ -223,19 +223,20 @@ def sistemAntrean(film_id: str):
                     judul_film=judul_film,
                 )
 
-                # Memasukan data ke dict untuk dimasukan ke field log_pemesanan
-                data_dict = {
-                    generateID(): {
-                        "nama": nama_customer,
-                        "jumlah_tiket": ticket_amount,
-                        "urutan_antrean": urutan_antrean,
-                        "judul": judul_film,
-                        "date": q.front.create_at,
-                    }
+                # Mengambil data log pemesanan
+                log_pemesanan = getAllData("log_pemesanan")
+
+                # Memasukan data ke dict log_pemesanan untuk dimasukan ke field log_pemesanan
+                log_pemesanan[generateID()] = {
+                    "nama": nama_customer,
+                    "jumlah_tiket": ticket_amount,
+                    "urutan_antrean": urutan_antrean,
+                    "judul": judul_film,
+                    "date": q.front.create_at,
                 }
 
                 # Memasukan data ke field_log pemesanan
-                updateData(data_dict=data_dict, data_name="log_pemesanan")
+                updateData(data_dict=log_pemesanan, data_name="log_pemesanan")
 
                 # Hapus customer yang telah dilayani dari antrean
                 served_node = q.dequeue()
@@ -304,8 +305,12 @@ def sistemAntrean(film_id: str):
 
                 # Mengandung function untuk sort kursi
                 # Karena kalau langsung di-extend, akan menjadi berantakan
-                available_seat.extend(refunded_seat)  # Tambah kursi yang dipesan ke available seat
-                available_seat.sort(key=lambda x: int(''.join(filter(str.isdigit, x))))  # Sort
+                available_seat.extend(
+                    refunded_seat
+                )  # Tambah kursi yang dipesan ke available seat
+                available_seat.sort(
+                    key=lambda x: int("".join(filter(str.isdigit, x)))
+                )  # Sort
                 # Code di atas harusnya bisa juga selain format 'K1' dll.
 
             case "7":  # Cari Data Pemesanan
