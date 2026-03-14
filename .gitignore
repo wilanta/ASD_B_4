@@ -3,5 +3,5 @@ __pycache__/
 *.pyc
 CRUD/data/*
 !CRUD/data/.gitkeep
-CRUD/history/*
-!CRUD/history/.gitkeep
+CRUD/history/*/*
+!CRUD/history/invoices/.gitkeep

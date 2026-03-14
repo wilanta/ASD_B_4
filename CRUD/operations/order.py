@@ -53,5 +53,12 @@ def orderKursi(user_ticket: int, available_seats_list: list):
 # Nama fungsi: resetOrder
 # Penjelasan fungsi : Untuk mereset sistem antrean menjadi 0 antrean kembali.
 # ------------------------------
-def resetOrder():
-    pass
+def resetOrder(queue, linkedlist):
+    # reset queue
+    queue.front = None
+    queue.rear = None
+    queue.urutan = 1
+
+    # reset linked list
+    linkedlist.head = None
+    linkedlist.tail = None

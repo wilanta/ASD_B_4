@@ -343,8 +343,16 @@ def sistemAntrean(film_id: str):
                 ll.searchTicket(nama)
 
             case "8":  # Reset Antrean dan Pemesanan
-                # Reset Antrean dan Pemesanan
-                resetOrder()
+                # Call Function Reset
+                resetOrder(queue=q, linkedlist=ll)
+
+                # Reset available ticket dan available seat
+                available_ticket = int(film_dict[film_id]["kuota_penonton"])
+                available_seat = [
+                    "K" + str(i) for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
+                ]
+
+                print("Antrean dan pemesanan berhasil di-reset.\n")
 
             case "0":  # Kembali ke menu utama
                 print("Kembali ke menu utama.")
