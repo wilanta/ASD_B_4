@@ -238,6 +238,10 @@ def sistemAntrean(film_id: str):
                 # Memasukan data ke field_log pemesanan
                 updateData(data_dict=log_pemesanan, data_name="log_pemesanan")
 
+                # Cetak invoice
+                invoice(judul=judul_film, nama=nama_customer, kursi=selected_seat)
+                print("\nInvoice berhasil dicetak!")
+
                 # Hapus customer yang telah dilayani dari antrean
                 served_node = q.dequeue()
 
@@ -413,7 +417,11 @@ def main():
                             kuota_penonton = input("\nKuota Penonton \t: ")
 
                         # Ubah data film di database
-                        updateFilm(judul_film=judul, kuota_penonton=kuota_penonton, film_id=film_id)
+                        updateFilm(
+                            judul_film=judul,
+                            kuota_penonton=kuota_penonton,
+                            film_id=film_id,
+                        )
 
                     case "2":  # Delete Film
                         deleteFilm(film_id)
