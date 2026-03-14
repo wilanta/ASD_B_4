@@ -12,6 +12,10 @@ Fungsi/fitur:
 ==========================================================
 """
 
+# Utilities
+from CRUD.utils.idGenerator import generateID
+from CRUD.utils.dataOps import getAllData, updateData
+
 
 # ------------------------------
 # Nama fungsi: showFilm
