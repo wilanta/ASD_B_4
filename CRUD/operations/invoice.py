@@ -9,6 +9,13 @@ Fungsi/fitur:
 ==========================================================
 """
 
+# Module and dependencies needs
+from reportlab.pdfgen import canvas
+from datetime import datetime
+import webbrowser
+import os
+
+
 # ------------------------------
 # Nama fungsi: invoice
 # Penjelasan fungsi : Untuk mencetak struk berbentuk pdf setelah customer dilayani
