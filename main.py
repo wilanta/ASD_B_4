@@ -18,7 +18,7 @@ Fungsi/fitur:
 from CRUD.operations.queue import Queue
 
 # linked list
-from CRUD.operations.linkedList import LinkedList
+from CRUD.operations.ticket import Ticket
 
 # order
 from CRUD.operations.order import orderKursi, resetOrder
@@ -107,7 +107,7 @@ def sistemAntrean(film_id: str):
     q = Queue()
 
     # Inisialisasi linked list
-    ll = LinkedList()
+    ll = Ticket()
 
     # Menampilkan menu sistem antrean secara berulang sampai user memilih untuk kembali ke menu utama
     while True:

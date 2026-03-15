@@ -15,13 +15,13 @@ Fungsi/fitur:
 from CRUD.utils.node import Node
 from CRUD.utils.seatSort import seat_sort
 
-# ````````````````````````````````````````````
-# Nama kelas: LinkedList
-# Penjelasan kelas : Untuk membuat linked list yang akan digunakan untuk menyimpan data dan log pemesanan tiket.
-# ````````````````````````````````````````````
 
-
-class LinkedList:
+# ````````````````````````````````````````````
+# Nama kelas: Ticket
+# Penjelasan kelas : Untuk membuat linked list yang akan digunakan untuk
+# menyimpan data dan log pemesanan tiket.
+# ````````````````````````````````````````````
+class Ticket:
     "LinkedList untuk data pemesanan."
 
     def __init__(self):
