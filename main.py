@@ -30,9 +30,9 @@ from CRUD.operations.film import showFilm, addFilm, updateFilm, deleteFilm
 from CRUD.operations.invoice import invoice
 
 # utillities & libraries
-# from CRUD.utils.nodeGenerator import generateNode
 from CRUD.utils.idGenerator import generateID
 from CRUD.utils.dataOps import getAllData, searchData, updateData
+from CRUD.utils.seatSort import seat_sort
 
 import pandas as pd
 
@@ -114,7 +114,8 @@ def sistemAntrean(film_id: str):
         # Menampilkan menu
         print("====== Sistem Informasi Antrean ======")
         print(
-            f"Judul Film \t: {film_dict[film_id]['judul_film']}\nTiket Tersedia \t: {available_ticket}\n"  # Menampilkan informasi film
+            # Menampilkan informasi film
+            f"Judul Film \t: {film_dict[film_id]['judul_film']}\nTiket Tersedia \t: {available_ticket}\n"
         )
 
         # Menampilkan opsi
@@ -153,7 +154,8 @@ def sistemAntrean(film_id: str):
                         print(
                             "Nama penonton harus berupa huruf dan tidak boleh berupa simbol."
                         )
-                        nama_penonton = input("\nMasukkan nama penonton: ").strip()
+                        nama_penonton = input(
+                            "\nMasukkan nama penonton: ").strip()
 
                     # Menambahkan penonton ke antrean
                     q.enqueue(nama_penonton)
@@ -178,7 +180,8 @@ def sistemAntrean(film_id: str):
                 # Loop user input
                 while True:
                     try:
-                        user_ticket = int(input("Masukkan jumlah tiket yang dipesan: "))
+                        user_ticket = int(
+                            input("Masukkan jumlah tiket yang dipesan: "))
 
                         # Jika tiket kurang dari 1 atau lebih dari 4
                         if user_ticket < 1 or user_ticket > max_kursi_per_cust:
@@ -197,7 +200,8 @@ def sistemAntrean(film_id: str):
                         print("Masukkan bilangan yang valid!")
 
                 # Mengambil data jumlah_tiket dan nomor_kursi dari user
-                ticket_amount, selected_seat = orderKursi(user_ticket, available_seat)
+                ticket_amount, selected_seat = orderKursi(
+                    user_ticket, available_seat)
 
                 # Kurangi tiket yang tersedia
                 available_ticket -= ticket_amount
@@ -239,7 +243,8 @@ def sistemAntrean(film_id: str):
                 updateData(data_dict=log_pemesanan, data_name="log_pemesanan")
 
                 # Cetak invoice
-                invoice(judul=judul_film, nama=nama_customer, kursi=selected_seat)
+                invoice(judul=judul_film, nama=nama_customer,
+                        kursi=selected_seat)
                 print("\nInvoice berhasil dicetak!")
 
                 # Hapus customer yang telah dilayani dari antrean
@@ -273,7 +278,8 @@ def sistemAntrean(film_id: str):
                     print(
                         "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
                     )
-                    nama = input("Nama customer yang akan dibatalkan : ").strip()
+                    nama = input(
+                        "Nama customer yang akan dibatalkan : ").strip()
 
                 # Hapus customer dari antrean
                 q.cancelQueue(nama)
@@ -300,7 +306,8 @@ def sistemAntrean(film_id: str):
                     print(
                         "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
                     )
-                    nama = input("Nama customer yang akan dibatalkan : ").strip()
+                    nama = input(
+                        "Nama customer yang akan dibatalkan : ").strip()
 
                 # Hapus customer dari node linked list data pemesanan dan field log_pemesanan
                 # Tambahkan kembali tiket dan kursi tersedia
@@ -312,10 +319,7 @@ def sistemAntrean(film_id: str):
                 available_seat.extend(
                     refunded_seat
                 )  # Tambah kursi yang dipesan ke available seat
-                available_seat.sort(
-                    key=lambda x: int("".join(filter(str.isdigit, x)))
-                )  # Sort
-                # Code di atas harusnya bisa juga selain format 'K1' dll.
+                available_seat = seat_sort(available_seat)
 
             case "7":  # Cari Data Pemesanan
                 # Jika data pemesanan kosong, keluar dari search

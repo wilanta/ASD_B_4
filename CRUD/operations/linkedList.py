@@ -13,6 +13,7 @@ Fungsi/fitur:
 """
 
 from CRUD.utils.node import Node
+from CRUD.utils.seatSort import seat_sort
 
 # ````````````````````````````````````````````
 # Nama kelas: LinkedList
@@ -138,20 +139,20 @@ class LinkedList:
             nama (str): Nama customer
         """
 
-        current = self.head
-        found = False  # Flag untuk data yang ditemukan
+        current = self.head  # Iterasi dari awal
+        found = False  # Flag untuk mengecek keberadaan data
         while current:
             if current.nama == nama:
                 print("=" * 45)
                 print("Nama\t\t:", current.nama)
                 print("Jumlah Tiket\t:", current.jumlah_tiket)
-                print("Nomor Kursi\t:", current.nomor_kursi.sort(
-                    key=lambda x: int(''.join(filter(str.isdigit, x)))))  # Sort nomor kursi
+                print("Nomor Kursi\t:", ', '.join(
+                    seat_sort(current.nomor_kursi)))
                 print("Judul Film\t:", current.judul_film)
                 print("Tanggal\t\t:", current.create_at)
-                print("=" * 45)
+                print("=" * 45, '\n')
                 found = True
             current = current.next
 
-        if not found:  # If not found
+        if not found:  # Jika nama tidak ditemukan
             print("Nama tidak ditemukan.")

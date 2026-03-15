@@ -10,10 +10,12 @@ Fungsi/fitur:
 """
 
 # Module and dependencies needs
-from reportlab.pdfgen import canvas
 from datetime import datetime
 import webbrowser
 import os
+from reportlab.pdfgen import canvas
+
+from CRUD.utils.seatSort import seat_sort
 
 
 # ------------------------------
@@ -69,7 +71,7 @@ def invoice(judul, nama, kursi):
         "--------------------------------",
         f"Judul  : {judul}",
         f"Nama   : {nama}",
-        f"Kursi  : {', '.join(kursi)}",
+        f"Kursi  : {', '.join(seat_sort(kursi))}",
         f"Tanggal: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}",
         "--------------------------------",
         "Dilayani : Admin",
@@ -97,4 +99,3 @@ def invoice(judul, nama, kursi):
 
     # mengembalikan path file invoice
     return filepath
-
