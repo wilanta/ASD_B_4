@@ -17,7 +17,7 @@ Fungsi/fitur:
 # queue
 from CRUD.operations.queue import Queue
 
-# linked list
+# linked list / ticket
 from CRUD.operations.ticket import Ticket
 
 # order
@@ -106,7 +106,7 @@ def sistemAntrean(film_id: str):
     # Inisialisasi queue
     q = Queue()
 
-    # Inisialisasi linked list
+    # Inisialisasi ticket
     ll = Ticket()
 
     # Menampilkan menu sistem antrean secara berulang sampai user memilih untuk kembali ke menu utama
@@ -343,12 +343,12 @@ def sistemAntrean(film_id: str):
                     )
                     nama = input("Nama customer yang akan dicari : ").strip()
 
-                # Cari data di node linked list pemesanan
+                # Cari data di node linked list pemesanan / ticket
                 ll.searchTicket(nama)
 
             case "8":  # Reset Antrean dan Pemesanan
                 # Call Function Reset
-                resetOrder(queue=q, linkedlist=ll)
+                resetOrder(queue=q, ticket=ll)
 
                 # Reset available ticket dan available seat
                 available_ticket = int(film_dict[film_id]["kuota_penonton"])
