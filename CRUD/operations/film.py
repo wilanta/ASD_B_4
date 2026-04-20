@@ -76,18 +76,19 @@ def pilihFilm() -> str | None:
 
 # ------------------------------
 # Nama fungsi: updateFilm
-# Penjelasan fungsi : Untuk untuk menganti judul film dan kuota penonton film serta menyimpannya ke file .txt.
+# Penjelasan fungsi : Untuk untuk menganti judul film dan kuota
+#                     penonton film serta menyimpannya ke file .txt.
 # ------------------------------
 def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
     """
     Meng-update judul film dan kuota penonton.
-    
+
     Args:
         judul_film (str): Judul Film
         kuota_penonton (str): Kuota Penonton
         film_id (str): ID Film
     """
-    
+
     # Mengambil data dari database agar data lainnya tidak terhapus
     data_film = getAllData("data_film")
 
@@ -112,6 +113,13 @@ def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
 # Penjelasan fungsi : Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
 # ------------------------------
 def deleteFilm(film_id):
+    """
+    Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
+
+    Args:
+        film_id (str): ID film
+    """
+
     # Ambil data dari database
     data_film = getAllData("data_film")
 
@@ -131,6 +139,14 @@ def deleteFilm(film_id):
 # Penjelasan fungsi : Untuk menambahkan film ke daftar film serta menyimpannya ke file data_film.txt.
 # ------------------------------
 def addFilm(judul: str, kuota_penonton: int):
+    """
+    Menambahkan film ke daftar file txt data_film
+
+    Args:
+        judul (str): Judul film
+        kuota_penonton (int): Kuota / kapasitas penonton
+    """
+
     # Mengambil data dari database agar data baru tidak menimpa data lama
     data_film = getAllData("data_film")
 

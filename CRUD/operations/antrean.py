@@ -210,8 +210,6 @@ def sistemAntrean(film_id: str):
                 ll.showTickets()
 
             case "5":  # Batalkan Antrean
-                empty = True
-
                 # Jika antrean kosong, maka tidak ada data yang bisa dibatalkan
                 if q.isEmpty():
                     print("Antrean kosong, tidak ada data yang bisa dibatalkan!")
@@ -223,28 +221,23 @@ def sistemAntrean(film_id: str):
                         "Nama customer yang akan dibatalkan (Enter untuk kembali): "
                     ).strip()
 
-                    # Jika nama kosong, kembali ke menu
-                    if not nama:
-                        break
-
                     # Jika user memasukan inputan yang tidak tepat
-                    if nama.strip().replace(" ", "").isalpha():
-                        empty = not empty
+                    if nama.strip().replace(" ", "").isalpha() or not nama:
                         break
 
                     print(
                         "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
                     )
 
-                # Hapus customer dari antrean
-                try:
-                    # Assign 2 value ke 2 variable.
-                    canceled_user, canceled_urutan = q.cancelQueue(nama)
-                    if not canceled_user:
-                        print("Nama tidak ditemukan")
-                        continue
-                except TypeError:
+                if not nama:
                     print("Kembali ke menu...")
+                    continue
+
+                # Assign 2 value ke 2 variable.
+                canceled_user, canceled_urutan = q.cancelQueue(nama)
+                # Hapus customer dari antrean
+                if not canceled_user:
+                    print("Nama tidak ditemukan.")
                     continue
 
                 print(
@@ -256,26 +249,32 @@ def sistemAntrean(film_id: str):
                     print("Data pemesanan kosong, tidak ada data yang bisa dibatalkan!")
                     continue
 
-                # Meminta inputan nama customer dari user
-                nama = input(
-                    "Nama customer yang akan dibatalkan (Enter untuk kembali): "
-                ).strip()
+                while True:
+                    # Meminta inputan nama customer dari user
+                    nama = input(
+                        "Nama customer yang akan dibatalkan (Enter untuk kembali): "
+                    ).strip()
+
+                    if nama.isalpha() or not nama:
+                        break
+
+                    print(
+                        "Nama customer harus berupa huruf dan tidak boleh berupa simbol.")
 
                 # Jika nama kosong, kembali ke menu
-                if nama == "":
+                if not nama:
+                    print("Kembali ke menu...")
                     continue
 
-                # Jika user memasukan inputan yang tidak tepat
-                while not isinstance(nama, str) or not nama.isalpha():
-                    print(
-                        "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
-                    )
-                    nama = input(
-                        "Nama customer yang akan dibatalkan : ").strip()
-
                 # Hapus customer dari node linked list data pemesanan dan field log_pemesanan
-                # Tambahkan kembali tiket dan kursi tersedia
                 refunded_ticket, refunded_seat = ll.deleteTicket(nama)
+
+                # Cek apakah nama berada di list
+                if not refunded_ticket:
+                    print("Nama tidak ditemukan.")
+                    continue
+
+                # Tambahkan kembali tiket dan kursi tersedia
                 available_ticket += refunded_ticket
 
                 # Mengandung function untuk sort kursi
@@ -285,30 +284,35 @@ def sistemAntrean(film_id: str):
                 )  # Tambah kursi yang dipesan ke available seat
                 available_seat = seat_sort(available_seat)
 
+                print("Pemesanan berhasil dibatalkan!")
+
             case "7":  # Cari Data Pemesanan
                 # Jika data pemesanan kosong, keluar dari search
                 if ll.isEmpty():
                     print("Data pemesanan kosong, tidak ada data yang bisa dicari!")
                     continue
 
-                # Meminta inputan nama customer dari user
-                nama = input(
-                    "Nama customer yang akan dicari (Enter untuk kembali): "
-                ).strip()
+                while True:
+                    # Meminta inputan nama customer dari user
+                    nama = input(
+                        "Nama customer yang akan dicari (Enter untuk kembali): "
+                    ).strip()
 
-                # Jika nama kosong, kembali ke menu
-                if nama == "":
-                    continue
-
-                # Jika user memasukan inputan yang tidak tepat
-                while not isinstance(nama, str) or not nama.isalpha():
+                    # Validasi input (Semua harus berisi huruf atau tidak menginputkan nama)
+                    if nama.isalpha() or not nama:
+                        break
                     print(
                         "Nama customer harus berupa huruf dan tidak boleh berupa simbol."
                     )
-                    nama = input("Nama customer yang akan dicari : ").strip()
+
+                # Jika nama kosong, kembali ke menu
+                if not nama:
+                    print("Kembali ke menu...")
+                    continue
 
                 # Cari data di node linked list pemesanan / ticket
-                ll.searchTicket(nama)
+                if not ll.searchTicket(nama):
+                    print("Nama tidak ditemukan.")
 
             case "8":  # Reset Antrean dan Pemesanan
                 # Call Function Reset

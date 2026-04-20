@@ -341,5 +341,5 @@ class Queue:
                     return nama, urutan_batal
                 current = current.next
 
-        # Jika nama tidak ditemukan
-        return "", urutan_batal
+        # Jika nama tidak ditemukan, return data kosong
+        return None, urutan_batal
