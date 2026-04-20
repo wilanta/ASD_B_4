@@ -108,7 +108,8 @@ class Queue:
     def dequeue(self) -> Node | None:
         """
         Menghapus data paling depan dari antrean (front)\n
-        Data yang dihapus merupakan data yang sedang dilayani, sehingga data tersebut akan diproses terlebih dahulu sebelum dihapus
+        Data yang dihapus merupakan data yang sedang dilayani, sehingga\n
+        data tersebut akan diproses terlebih dahulu sebelum dihapus
 
         Returns:
             Node: Node yang dihapus dari antrean (data yang sedang dilayani)
@@ -205,8 +206,6 @@ class Queue:
 
         Args:
             start_node (Node): Node yang menjadi titik awal penyesuaian nomor urut antrean (node setelah node yang dibatalkan)
-
-        Return:
         """
 
         current = start_node

@@ -102,8 +102,8 @@ class Ticket:
             nama (str): Nama customer
 
         Return:
-            1. Jumlah tiket yang dibatalkan
-            2. Nomor kursi yang dibatalkan
+            jumlah_tiket (int): Jumlah tiket yang dibatalkan
+            nomor_kursi (list): Nomor kursi yang dibatalkan
         """
         current = self.head  # Variabel sementara dari awal node
 
@@ -136,6 +136,9 @@ class Ticket:
 
         Args:
             nama (str): Nama customer
+        
+        Returns:
+            found (bool): Tampilkan list atau tidak
         """
 
         current = self.head  # Iterasi dari awal
