@@ -43,12 +43,13 @@ class Queue:
     # Penjelasan fungsi : Untuk mengecek apakah antrean kosong.
     # ===============================
     def isEmpty(self):
-        # Ketika queue kosong maka front -> rear -> none
+        "Ketika queue kosong maka front -> rear -> none"
         return self.front is None
 
     # ===============================
     # Nama fungsi: enqueue
-    # Penjelasan fungsi : Untuk menambahkan client ke antrean (menambahkan data baru ke bagian belakang).
+    # Penjelasan fungsi : Untuk menambahkan client ke antrean
+    #                     (menambahkan data baru ke bagian belakang).
     # ===============================
     def enqueue(self, nama: str):
         """
@@ -60,7 +61,8 @@ class Queue:
         """
         new_node = Node(nama, urutan_antrean=self.urutan)
 
-        # Setiap data baru yang masuk ke antrean akan mendapatkan nomor urut yang bertambah 1 dari data sebelumnya
+        # Setiap data baru yang masuk ke antrean akan mendapatkan
+        # nomor urut yang bertambah 1 dari data sebelumnya
         self.urutan += 1
 
         # Jika data baru masuk dari queue yang kosong maka data baru -> rear
@@ -69,13 +71,15 @@ class Queue:
             self.rear = new_node
             return
 
-        # Jika queue tidak kosong, maka data baru diletakan setelah rear kemudian dijadikan sebagai rear
+        # Jika queue tidak kosong, maka data baru diletakkan
+        # setelah rear kemudian dijadikan sebagai rear
         self.rear.next = new_node
         self.rear = new_node
 
     # ===============================
     # Nama fungsi: updateQueue
-    # Penjelasan fungsi : Untuk memperbarui data pada node yang ada dalam antrean pada fase layani antrean.
+    # Penjelasan fungsi : Untuk memperbarui data pada node
+    #                     yang ada dalam antrean pada fase layani antrean.
     # ===============================
     def updateQueue(self, jumlah_tiket: int, nomor_kursi: list, judul_film: str):
         """
@@ -121,7 +125,8 @@ class Queue:
         # geser pointer front ke next front
         self.front = self.front.next
 
-        # Jika setelah menggeser pointer front, front menjadi None, maka rear juga harus diubah menjadi None (antrean menjadi kosong)
+        # Jika setelah menggeser pointer front, front menjadi None, maka rear juga
+        # harus diubah menjadi None (antrean menjadi kosong)
         if self.front is None:
             self.rear = None
 
@@ -145,7 +150,8 @@ class Queue:
         data = []
         current = self.front
 
-        # Melakukan iterasi untuk mengambil data dari setiap node dalam antrean dan menyimpannya dalam list data
+        # Melakukan iterasi untuk mengambil data dari setiap node dalam antrean dan
+        # menyimpannya dalam list data
         while current is not None:
             data.append(current.nama)
             current = current.next
@@ -174,14 +180,10 @@ class Queue:
         Returns:
             int: Jumlah kemunculan nama dalam antrean
         """
-
-        # Jika antrean kosong, maka tidak ada data yang bisa dihitung
-        if self.isEmpty():
-            return 0
-
         # Menginisialisasi variabel untuk menyimpan jumlah kemunculan nama
         count = 0
-        current = self.front
+
+        current = self.front  # Inisialisasi iterasi
 
         # Melakukan iterasi untuk menghitung jumlah kemunculan nama dalam antrean
         while current is not None:
@@ -198,7 +200,8 @@ class Queue:
     def adjustAntrean(self, start_node):
         """
         Menyesuaikan nomor urut antrean setelah pembatalan antrean\n
-        Setelah satu node dalam antrean dibatalkan, maka nomor urut dari node-node setelahnya harus disesuaikan dengan mengurangi nomor urut sebanyak 1
+        Setelah satu node dalam antrean dibatalkan, maka nomor urut dari node-node setelahnya\n
+        harus disesuaikan dengan mengurangi nomor urut sebanyak 1
 
         Args:
             start_node (Node): Node yang menjadi titik awal penyesuaian nomor urut antrean (node setelah node yang dibatalkan)
@@ -223,17 +226,26 @@ class Queue:
 
         Args:
             nama (str): Nama client yang akan dibatalkan dari antrean
+        Returns:
+            nama (str): Nama client yang dibatalkan dari antrean
+            urutan_batal (int): Urutan saat client dibatalkan
         """
 
         # Inisialisasi fungsi countNameInQueue untuk menentukan step mana yang akan berjalan
         count_nama = self.countNameInQueue(nama)
 
-        # Jika terdapat lebih dari 1 data dengan nama yang sama dalam antrean, maka dapat ditentukan dengan urutan antrean
+        # Inisialisasi variabel urutan batal
+        urutan_batal = 0
+
+        # Jika terdapat lebih dari 1 data dengan nama yang sama dalam antrean,
+        # maka dapat ditentukan dengan urutan antrean
         if count_nama > 1:
             # Mencetak jumlah data dengan nama yang sama dalam antrean
-            print(f"\nTerdapat {count_nama} data dengan nama '{nama}' dalam antrean.")
+            print(
+                f"\nTerdapat {count_nama} data dengan nama '{nama}' dalam antrean.")
 
-            # Melakukan iterasi untuk mencari data dengan nama yang sama dalam antrean, menampilkan urutan antreannya, dan menyimpan urutannya
+            # Melakukan iterasi untuk mencari data dengan nama yang sama dalam antrean,
+            # menampilkan urutan antreannya, dan menyimpan urutannya
             current = self.front
             urutan_list = []
             while current is not None:
@@ -244,33 +256,25 @@ class Queue:
                 urutan_list.append(current.urutan_antrean)
                 current = current.next
 
-            # Meminta input urutan antrean yang akan dibatalkan
-            urutan_batal = input(
-                "\nNomor antrean yang akan dibatalkan (Enter untuk kembali) : "
-            ).strip()
-
-            # Jika user menekan Enter tanpa memasukkan nomor antrean, maka batal membatalkan antrean dan kembali ke menu sistem antrean
-            if urutan_batal == "":
-                return
-
-            # Validasi input urutan batal, jika tidak berupa angka atau tidak sesuai pada urutan yang ada, tanyakan kembali
-            while (
-                not urutan_batal.isdigit()
-                and urutan_batal != ""
-                or int(urutan_batal) not in urutan_list
-            ):
-                # Mengecek untuk error message
-                if not urutan_batal.isdigit() and urutan_batal != "":
-                    print("Input harus berupa angka!")
-                else:
-                    print("Urutan antrean tidak valid!")
-
+            while True:  # Loop hingga input valid
+                # Meminta input urutan antrean yang akan dibatalkan
                 urutan_batal = input(
-                    "Nomor antrean yang akan dibatalkan (Enter untuk kembali) : "
+                    "\nNomor antrean yang akan dibatalkan (Enter untuk kembali) : "
                 ).strip()
 
-            # Mengubah input urutan batal ke integer
-            urutan_batal = int(urutan_batal)
+                # Jika user menekan Enter tanpa memasukkan nomor antrean, maka batal membatalkan
+                # antrean dan kembali ke menu sistem antrean
+                if not urutan_batal:
+                    return
+                try:
+                    urutan_batal = int(urutan_batal)
+                except ValueError:
+                    print("Urutan antrean tidak valid!")
+                    continue
+
+                # Validasi apakah input urutan batal ada di list
+                if urutan_batal in urutan_list:
+                    break
 
             # Jika data yang dibatalkan merupakan data bagian front
             if self.front.nama == nama and self.front.urutan_antrean == urutan_batal:
@@ -279,31 +283,30 @@ class Queue:
 
                 # Set kembali urutan_antrean
                 self.adjustAntrean(self.front)
+                return nama, urutan_batal
 
-                print(f"Antrean atas nama {nama} berhasil dibatalkan.")
-                return
-
-            # Melakukan iterasi untuk mencari data dengan nama dan urutan antrean yang sesuai untuk dibatalkan
+            # Melakukan iterasi untuk mencari data dengan nama dan
+            # urutan antrean yang sesuai untuk dibatalkan
             current = self.front
             while current is not None:
                 if (
                     current.next.nama == nama
                     and current.next.urutan_antrean == urutan_batal
                 ):
-                    # Jika data ditemukan, maka data tersebut dihapus dari antrean dengan mengubah pointer next dari node sebelumnya ke node setelahnya
+                    # Jika data ditemukan, maka data tersebut dihapus dari antrean dengan
+                    # mengubah pointer next dari node sebelumnya ke node setelahnya
                     current.next = current.next.next
 
-                    # Jika data yang dibatalkan merupakan data bagian rear, maka rear juga harus diubah menjadi node sebelumnya
+                    # Jika data yang dibatalkan merupakan data bagian rear,
+                    # maka rear juga harus diubah menjadi node sebelumnya
                     if current.next is None:
                         self.rear = current
 
-                    # Setelah data dibatalkan, maka nomor urut dari node-node setelahnya harus disesuaikan dengan mengurangi nomor urut sebanyak 1
+                    # Setelah data dibatalkan, maka nomor urut dari node-node setelahnya harus
+                    # disesuaikan dengan mengurangi nomor urut sebanyak 1
                     self.adjustAntrean(current.next)
 
-                    print(
-                        f"Antrean atas nama {nama} dengan urutan {urutan_batal} berhasil dibatalkan."
-                    )
-                    return
+                    return nama, urutan_batal
                 current = current.next
 
         # Jika hanya terdapat 1 nama dalam antrean
@@ -316,26 +319,27 @@ class Queue:
                 # Set kembali urutan_antrean
                 self.adjustAntrean(self.front)
 
-                print(f"Antrean atas nama {nama} berhasil dibatalkan.")
-                return
+                return nama, urutan_batal
 
             # Melakukan iterasi untuk mencari data yang akan dibatalkan dalam antrean
             current = self.front
             while current.next is not None:
                 if current.next.nama == nama:
-                    # Jika data ditemukan, maka data tersebut dihapus dari antrean dengan mengubah pointer next dari node sebelumnya ke node setelahnya
+                    # Jika data ditemukan, maka data tersebut dihapus dari antrean dengan
+                    # mengubah pointer next dari node sebelumnya ke node setelahnya
                     current.next = current.next.next
 
-                    # Jika data yang dibatalkan merupakan data bagian rear, maka rear juga harus diubah menjadi node sebelumnya
+                    # Jika data yang dibatalkan merupakan data bagian rear, maka rear juga harus
+                    # diubah menjadi node sebelumnya
                     if current.next is None:
                         self.rear = current
 
-                    # Setelah data dibatalkan, maka nomor urut dari node-node setelahnya harus disesuaikan dengan mengurangi nomor urut sebanyak 1
+                    # Setelah data dibatalkan, maka nomor urut dari node-node setelahnya harus
+                    # disesuaikan dengan mengurangi nomor urut sebanyak 1
                     self.adjustAntrean(current.next)
 
-                    print(f"Antrean atas nama {nama} berhasil dibatalkan.")
-                    return
+                    return nama, urutan_batal
                 current = current.next
 
-        # Jika data tidak ditemukan dalam antrean, maka tampilkan pesan bahwa data tidak ditemukan
-        print(f"Antrean atas nama {nama} tidak ditemukan.")
+        # Jika nama tidak ditemukan
+        return "", urutan_batal
