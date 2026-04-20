@@ -11,60 +11,84 @@ Fungsi/fitur:
 4. addFilm
 ==========================================================
 """
+# External
+import pandas as pd
 
 # Utilities
 from CRUD.utils.idGenerator import generateID
 from CRUD.utils.dataOps import getAllData, updateData
 
-
 # ------------------------------
-# Nama fungsi: showFilm
-# Penjelasan fungsi : Untuk menampilkan daftar film.
+# Nama fungsi: pilihFilm
+# Penjelasan fungsi : Untuk memilih film yang akan dimanage sistem anterannya.
 # ------------------------------
 
-def showFilm() -> str:
-    """
-    Menampilkan daftar film yang tersedia
 
-    Returns:
-        str: film_id yang dipilih oleh user
+def pilihFilm() -> str | None:
     """
-    # Cetak title
-    print("==== Daftar Film ====")
+    Memilih film dan mengembalikan string ID film dari database.
 
-    # Ambil data untuk cetak judul film
+    Return:
+        id (str): id film.
+    """
+
+    # Menampilkan header
+    print("==== PILIH FILM =====")
+
+    # Mengambil data_film dari database
     data_film = getAllData("data_film")
-    no = 1
 
-    # Menyimpan film id
-    film_ids = []
+    # Memasukan data_film ke data frame untuk ditampilkan
+    df = pd.DataFrame(data_film).T
 
-    # Cetak judul film
-    for film_id, data_film in data_film.items():
-        # Cetak judul film
-        print(f"{no}. {data_film['judul_film']}")
+    # Memodifikasi data frame
+    df.drop(
+        columns=["kuota_penonton"], inplace=True
+    )  # Menghilangkan kuota_penonton dari data frame
+    df.rename(
+        columns={"judul_film": "JUDUL FILM"}, inplace=True
+    )  # Mengganti title judul_film -> JUDUL FILM
+    df.insert(
+        0, "NO", range(1, len(df) + 1)
+    )  # Menambah urutan angka ke kolom 1 data frame
 
-        # Tambah id ke film_ids
-        film_ids.append(film_id)
+    # Menampilkan data frame
+    print(df.to_string(index=False))
 
-        # Iterasi nomor urutan
-        no += 1
+    # Meminta pilihan judul film
+    pilih = input("\nPilih Nomor : ")
 
-    # Result id film
-    pilih = input("\nPilih : ").strip()
+    # Validasi tipe input, jika tidak berupa angka tanyakan kembali
+    while not pilih.isdigit():
+        print("Input harus berupa angka.")
+        pilih = input("\nPilih Nomor : ")
 
-    # Input validator dan return
-    if pilih.isdigit() and int(pilih) <= len(film_ids) and int(pilih) > 0:
-        return film_ids[int(pilih) - 1]
-    else:
-        return
+    # Mengubah input plih ke integer
+    pilih = int(pilih)
+
+    # Validasi urutan input
+    if 1 <= pilih <= len(data_film):
+        # Ambil ID sesuai urutan
+        film_id = list(data_film.keys())[pilih - 1]
+
+        return film_id
+
 
 # ------------------------------
 # Nama fungsi: updateFilm
-# Penjelasan fungsi : Untuk untuk menganti judul film dan kuota penonton film serta menyimpannya ke file .txt.
+# Penjelasan fungsi : Untuk untuk menganti judul film dan kuota
+#                     penonton film serta menyimpannya ke file .txt.
 # ------------------------------
-
 def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
+    """
+    Meng-update judul film dan kuota penonton.
+
+    Args:
+        judul_film (str): Judul Film
+        kuota_penonton (str): Kuota Penonton
+        film_id (str): ID Film
+    """
+
     # Mengambil data dari database agar data lainnya tidak terhapus
     data_film = getAllData("data_film")
 
@@ -83,14 +107,19 @@ def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
     # Memanggil fungsi updateData untuk menyimpan update data film ke file data_film.txt
     updateData(data_dict=data_film, data_name="data_film")
 
-    # Success message
-    print("Film berhasil diupdate!")
+
 # ------------------------------
 # Nama fungsi: deleteFilm
 # Penjelasan fungsi : Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
 # ------------------------------
-
 def deleteFilm(film_id):
+    """
+    Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
+
+    Args:
+        film_id (str): ID film
+    """
+
     # Ambil data dari database
     data_film = getAllData("data_film")
 
@@ -99,20 +128,26 @@ def deleteFilm(film_id):
 
     # Message status
     if deleted:
-        print(f"Film `{deleted['judul_film']}`, berhasil dihapus!")
+        print(f"Film \"{deleted['judul_film']}\", berhasil dihapus!")
 
         # Rewritte pada database
         updateData(data_dict=data_film, data_name="data_film")
-    else:
-        print("Film gagal dihapus!")
+
 
 # ------------------------------
 # Nama fungsi: addFilm
 # Penjelasan fungsi : Untuk menambahkan film ke daftar film serta menyimpannya ke file data_film.txt.
 # ------------------------------
-
 def addFilm(judul: str, kuota_penonton: int):
-    		# Mengambil data dari database agar data baru tidak menimpa data lama
+    """
+    Menambahkan film ke daftar file txt data_film
+
+    Args:
+        judul (str): Judul film
+        kuota_penonton (int): Kuota / kapasitas penonton
+    """
+
+    # Mengambil data dari database agar data baru tidak menimpa data lama
     data_film = getAllData("data_film")
 
     # Simpan data terbaru ke dict data_film
@@ -120,9 +155,6 @@ def addFilm(judul: str, kuota_penonton: int):
         "judul_film": judul,
         "kuota_penonton": kuota_penonton,
     }
-    
+
     # Memanggil fungsi updateData untuk menyimpan data film baru ke file data_film.txt
     updateData(data_dict=data_film, data_name="data_film")
-
-    # Success message
-    print("Film berhasil ditambahkan!")

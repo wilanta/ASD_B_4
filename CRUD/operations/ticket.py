@@ -81,7 +81,7 @@ class Ticket:
         print("=" * 60)
         # Print jika list kosong
         if self.isEmpty():
-            print("Data tidak dapat ditemukan.")
+            print("Data masih kosong.")
         # Looping isi list
         while current:
             print(
@@ -102,8 +102,8 @@ class Ticket:
             nama (str): Nama customer
 
         Return:
-            1. Jumlah tiket yang dibatalkan
-            2. Nomor kursi yang dibatalkan
+            jumlah_tiket (int): Jumlah tiket yang dibatalkan
+            nomor_kursi (list): Nomor kursi yang dibatalkan
         """
         current = self.head  # Variabel sementara dari awal node
 
@@ -124,8 +124,7 @@ class Ticket:
             prev.next = current.next
             return current.jumlah_tiket, current.nomor_kursi
 
-        print("Nama tidak ditemukan!")
-        return 0
+        return None, None
 
     # ------------------------------
     # Nama fungsi: searchTicket
@@ -137,6 +136,9 @@ class Ticket:
 
         Args:
             nama (str): Nama customer
+        
+        Returns:
+            found (bool): Tampilkan list atau tidak
         """
 
         current = self.head  # Iterasi dari awal
@@ -154,5 +156,4 @@ class Ticket:
                 found = True
             current = current.next
 
-        if not found:  # Jika nama tidak ditemukan
-            print("Nama tidak ditemukan.")
+        return found
