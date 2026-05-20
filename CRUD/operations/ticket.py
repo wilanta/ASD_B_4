@@ -15,6 +15,10 @@ Fungsi/fitur:
 from CRUD.utils.node import Node
 from CRUD.utils.seatSort import seat_sort
 
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+
 
 # ````````````````````````````````````````````
 # Nama kelas: Ticket
@@ -45,8 +49,7 @@ class Ticket:
         """
 
         # Membuat node baru
-        new_node = Node(nama, jumlah_tiket, nomor_kursi,
-                        urutan_antrean, judul_film)
+        new_node = Node(nama, jumlah_tiket, nomor_kursi, urutan_antrean, judul_film)
 
         # Jika list kosong, buatkan head & tail dengan node baru
         if self.isEmpty():
@@ -69,25 +72,34 @@ class Ticket:
     # Nama fungsi: showTickets
     # Penjelasan fungsi : Untuk menampilkan semua ticket yang berada dalam linked list.
     # ------------------------------
+
     def showTickets(self):
         "Menunjukkan daftar pemesanan tiket."
-        current = self.head  # Inisialisasi awal node sebelum looping
-        i = 1  # Index urutan
-        print("=" * 60)
-        print("No", end=" | ")
-        print("Nama", end=f"{' ' * 12}| ")
-        print("Jumlah Tiket", end=" | ")
-        print("Tanggal")
-        print("=" * 60)
-        # Print jika list kosong
+
         if self.isEmpty():
             print("Data masih kosong.")
-        # Looping isi list
+            return
+
+        console = Console()
+
+        table = Table(title="Daftar Pemesanan Tiket", expand=False)
+
+        table.add_column("No", justify="center", width=5)
+        table.add_column("Nama", width=20)
+        table.add_column("Jumlah Tiket", justify="center", width=15)
+        table.add_column("Tanggal", width=20)
+
+        current = self.head
+        i = 1
+
         while current:
-            print(
-                f"{i: <2} | {current.nama: <15} | {current.jumlah_tiket: <12} | {current.create_at}")
+            table.add_row(
+                str(i), current.nama, str(current.jumlah_tiket), str(current.create_at)
+            )
             current = current.next
             i += 1
+
+        console.print(table)
 
     # ------------------------------
     # Nama fungsi: deleteTicket
@@ -136,24 +148,38 @@ class Ticket:
 
         Args:
             nama (str): Nama customer
-        
+
         Returns:
             found (bool): Tampilkan list atau tidak
         """
 
-        current = self.head  # Iterasi dari awal
-        found = False  # Flag untuk mengecek keberadaan data
+        current = self.head
+        found = False
+        console = Console()
+
         while current:
-            if current.nama == nama:
-                print("=" * 45)
-                print("Nama\t\t:", current.nama)
-                print("Jumlah Tiket\t:", current.jumlah_tiket)
-                print("Nomor Kursi\t:", ', '.join(
-                    seat_sort(current.nomor_kursi)))
-                print("Judul Film\t:", current.judul_film)
-                print("Tanggal\t\t:", current.create_at)
-                print("=" * 45, '\n')
+            if current.nama.lower() == nama.lower():
+                detail_table = Table(
+                    show_header=False, expand=False, box=None, padding=(0, 1)
+                )
+
+                detail_table.add_column("Field", style="cyan", width=15)
+                detail_table.add_column("Value", style="white")
+
+                detail_table.add_row("Nama", current.nama)
+                detail_table.add_row("Jumlah Tiket", str(current.jumlah_tiket))
+                detail_table.add_row(
+                    "Nomor Kursi", ", ".join(seat_sort(current.nomor_kursi))
+                )
+                detail_table.add_row("Judul Film", current.judul_film)
+                detail_table.add_row("Tanggal", str(current.create_at))
+
+                console.print(
+                    Panel(detail_table, title="Detail Pemesanan", border_style="green")
+                )
+
                 found = True
+
             current = current.next
 
         return found

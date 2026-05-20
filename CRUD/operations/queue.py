@@ -22,6 +22,11 @@ Method:
 # Import pandas untuk menampilkan queue
 import pandas as pd
 
+# Untuk menampilkan table
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+
 # Import class Node untuk membuat node yang akan digunakan pada queue
 from CRUD.utils.node import Node
 
@@ -141,31 +146,43 @@ class Queue:
         """
         Menampilkan data dalam antrean
         """
+        console = Console()
 
-        # Jika antrean kosong, maka tidak ada data yang bisa ditampilkan
+        # Jika antrean kosong
         if self.isEmpty():
-            print("Antrean kosong!")
+            console.print(
+                Panel(
+                    "[bold red]Antrean kosong![/bold red]",
+                    title="[bold red]Daftar Antrean[/bold red]",
+                    border_style="red",
+                )
+            )
             return
 
-        # Menginisialisasi list untuk menyimpan data antrean yang akan ditampilkan
-        data = []
+        # Membuat table
+        table = Table(
+            title="Daftar Antrean",
+            show_header=True,
+            header_style="bold cyan",
+            border_style="cyan",
+            expand=False,
+        )
+
+        # Menambahkan kolom
+        table.add_column("No", justify="center", width=6)
+        table.add_column("Nama", justify="left")
+
+        # Ambil data dari linked list
         current = self.front
+        no = 1
 
-        # Melakukan iterasi untuk mengambil data dari setiap node dalam antrean dan
-        # menyimpannya dalam list data
         while current is not None:
-            data.append(current.nama)
+            table.add_row(str(no), current.nama)
             current = current.next
+            no += 1
 
-        # Set data antrean ke dalam data frame untuk ditampilkan
-        df = pd.DataFrame(data, columns=["Nama"])
-
-        # Menambah urutan angka ke kolom pertama data frame
-        df.insert(0, "NO", range(1, len(df) + 1))
-
-        # Mencetak title dan data frame daftar antrean
-        print("====== Daftar Antrean ======")
-        print(df.to_string(index=False))
+        # Tampilkan table
+        console.print(table)
 
     # ===============================
     # Nama fungsi: countNameInQueue
@@ -240,8 +257,7 @@ class Queue:
         # maka dapat ditentukan dengan urutan antrean
         if count_nama > 1:
             # Mencetak jumlah data dengan nama yang sama dalam antrean
-            print(
-                f"\nTerdapat {count_nama} data dengan nama '{nama}' dalam antrean.")
+            print(f"\nTerdapat {count_nama} data dengan nama '{nama}' dalam antrean.")
 
             # Melakukan iterasi untuk mencari data dengan nama yang sama dalam antrean,
             # menampilkan urutan antreannya, dan menyimpan urutannya

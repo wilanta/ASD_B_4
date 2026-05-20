@@ -11,8 +11,13 @@ Fungsi/fitur:
 4. addFilm
 ==========================================================
 """
+
 # External
 import pandas as pd
+from rich import print
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
+
 
 # Utilities
 from CRUD.utils.idGenerator import generateID
@@ -33,45 +38,35 @@ def pilihFilm() -> str | None:
     """
 
     # Menampilkan header
-    print("==== PILIH FILM =====")
+    print("\n\n[bold white]Pilih Film[/bold white]")
+    print("[dim]Pilih untuk melanjutkan.[/dim]\n")
 
     # Mengambil data_film dari database
     data_film = getAllData("data_film")
 
-    # Memasukan data_film ke data frame untuk ditampilkan
-    df = pd.DataFrame(data_film).T
+    # Memasukan judul film ke list
+    title_list = [data["judul_film"] for data in data_film.values()]
+    title_list.append(Choice(value=None, name="--- Keluar ---"))
 
-    # Memodifikasi data frame
-    df.drop(
-        columns=["kuota_penonton"], inplace=True
-    )  # Menghilangkan kuota_penonton dari data frame
-    df.rename(
-        columns={"judul_film": "JUDUL FILM"}, inplace=True
-    )  # Mengganti title judul_film -> JUDUL FILM
-    df.insert(
-        0, "NO", range(1, len(df) + 1)
-    )  # Menambah urutan angka ke kolom 1 data frame
+    # Menampilkan pilihan dan meminta pilihan dari user
+    choice = inquirer.select(
+        message="",
+        choices=title_list,
+        default="Auto (match terminal)",
+        pointer=">",
+        instruction="Gunakan ↑ ↓ untuk memindahkan opsi, Enter untuk memilih",
+    ).execute()
 
-    # Menampilkan data frame
-    print(df.to_string(index=False))
+    film_id = next(
+        (
+            id_film
+            for id_film, data in data_film.items()
+            if data["judul_film"] == choice
+        ),
+        None,
+    )
 
-    # Meminta pilihan judul film
-    pilih = input("\nPilih Nomor : ")
-
-    # Validasi tipe input, jika tidak berupa angka tanyakan kembali
-    while not pilih.isdigit():
-        print("Input harus berupa angka.")
-        pilih = input("\nPilih Nomor : ")
-
-    # Mengubah input plih ke integer
-    pilih = int(pilih)
-
-    # Validasi urutan input
-    if 1 <= pilih <= len(data_film):
-        # Ambil ID sesuai urutan
-        film_id = list(data_film.keys())[pilih - 1]
-
-        return film_id
+    return film_id
 
 
 # ------------------------------
@@ -128,7 +123,7 @@ def deleteFilm(film_id):
 
     # Message status
     if deleted:
-        print(f"Film \"{deleted['judul_film']}\", berhasil dihapus!")
+        print(f'Film "{deleted["judul_film"]}", berhasil dihapus!')
 
         # Rewritte pada database
         updateData(data_dict=data_film, data_name="data_film")

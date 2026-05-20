@@ -22,6 +22,11 @@ from CRUD.operations.film import pilihFilm, addFilm, updateFilm, deleteFilm
 
 from CRUD.utils.dataOps import getAllData
 
+# Untuk interface
+from InquirerPy import inquirer
+from rich import print
+import shutil
+
 
 # ------------------------------
 # Nama fungsi: main
@@ -30,20 +35,42 @@ from CRUD.utils.dataOps import getAllData
 def main():
     # menampilkam menu utama secara berulang sampai user memilih untuk keluar
     while True:
-        # Menampilkan pilihan
-        print("\n==== BIOSKOP CACB ====")
-        print("1. Sistem Informasi Antrean")
-        print("2. Daftar Film")
-        print("3. Tambah Film")
-        print("0. Keluar")
-        print()
+        print("""
+[bold white]
+██████╗ ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗      ██████╗ █████╗  ██████╗██████╗
+██╔══██╗██║██╔═══██╗██╔════╝██║ ██╔╝██╔═══██╗██╔══██╗    ██╔════╝██╔══██╗██╔════╝██╔══██╗
+██████╔╝██║██║   ██║███████╗█████╔╝ ██║   ██║██████╔╝    ██║     ███████║██║     ██████╔╝
+██╔══██╗██║██║   ██║╚════██║██╔═██╗ ██║   ██║██╔═══╝     ██║     ██╔══██║██║     ██╔══██╗
+██████╔╝██║╚██████╔╝███████║██║  ██╗╚██████╔╝██║         ╚██████╗██║  ██║╚██████╗██████╔╝
+╚═════╝ ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝          ╚═════╝╚═╝  ╚═╝ ╚═════╝╚═════╝
+[/bold white]
+""")
+        width = shutil.get_terminal_size().columns
+        print("-" * width)
 
-        # Meminta masukan pilihan dari user
-        pilihan = input("Pilih : ")
+        print("[bold white]Pilih menu yang ingin diakses[/bold white]")
+        print("[dim]Pilih untuk melanjutkan.[/dim]\n")
+
+        print("-" * width)
+
+        # Menampilkan pilihan dan meminta pilihan dari user
+        choice = inquirer.select(
+            message="",
+            choices=[
+                "1. Sistem Informasi Antrean",
+                "2. Daftar Film",
+                "3. Tambah Film",
+                "4. Laporan Penjualan Tiket",
+                "0. Keluar",
+            ],
+            default="Auto (match terminal)",
+            pointer=">",
+            instruction="Gunakan ↑ ↓ untuk memindahkan opsi, Enter untuk memilih",
+        ).execute()
 
         # Mengecek nilai dari variabel 'pilihan'
-        match pilihan:
-            case "1":  # Sistem Antrean
+        match choice:
+            case "1. Sistem Informasi Antrean":  # Sistem Antrean
                 # Memanggil pilihFilm untuk memilih film yang akan dioperasikan antreannya
                 film_id = pilihFilm()
 
@@ -53,38 +80,45 @@ def main():
                 else:
                     print("Tidak sesuai nomor di urutan. Kembali ke menu utama...")
 
-            case "2":  # Show film
+            case "2. Daftar Film":  # Show film
                 film_id = pilihFilm()
 
                 # Film_id validator
                 if film_id is None:
                     continue
 
-                print("\nPilih Operasi : ")
-                print("1. Update")
-                print("2. Delete")
-                print("0. Kembali")
+                choice = inquirer.select(
+                    message="",
+                    choices=[
+                        "1. Update",
+                        "2. Delete",
+                        "0. Kembali",
+                    ],
+                    default="Auto (match terminal)",
+                    pointer=">",
+                    instruction="Gunakan ↑ ↓ untuk memindahkan opsi, Enter untuk memilih",
+                ).execute()
 
-                pilihan = input("\nPilih : ")
-
-                match pilihan:
-                    case "1":  # Update Film
+                match choice:
+                    case "1. Update":  # Update Film
                         film = getAllData("data_film").get(film_id)
 
                         # Title ubah film
-                        print("==== Ubah Film ====")
-                        print("Judul \t\t:", film['judul_film'])
-                        print("Kuota Penonton \t:", film['kuota_penonton'])
-                        print("Kosongkan isian jika tidak ingin mengganti isi data")
+                        print("\n======== Ubah Film ========")
+                        print("Judul \t\t:", film["judul_film"])
+                        print("Kuota Penonton \t:", film["kuota_penonton"])
+                        print("\nKosongkan isian jika tidak ingin mengganti isi data")
 
                         # Input data film dan Loop hingga operasi selesai
                         while True:
                             judul = input("Judul \t\t: ").strip()
-                            kuota_penonton = input(
-                                "Kuota Penonton \t: ").strip()
+                            kuota_penonton = input("Kuota Penonton \t: ").strip()
 
                             # Validasi kuota penonton harus berupa angka
-                            if not kuota_penonton or (kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 100):
+                            if not kuota_penonton or (
+                                kuota_penonton.isdigit()
+                                and 0 < int(kuota_penonton) <= 100
+                            ):
                                 break
                             print("Kuota penonton harus berupa angka valid!")
 
@@ -97,29 +131,28 @@ def main():
 
                         print("Film berhasil diubah!")
 
-                    case "2":  # Delete Film
+                    case "2. Delete":  # Delete Film
                         deleteFilm(film_id)
 
                         print("Film berhasil dihapus!")
 
-                    case "0":  # Kembali ke menu utama
+                    case "0. Kembali":  # Kembali ke menu utama
                         print("Kembali ke menu utama.")
                         continue
 
                     case _:  # Pilihan tidak valid
                         print("Pilihan tidak valid!")
 
-            case "3":  # Tambah Film
+            case "3. Tambah Film":  # Tambah Film
                 empty = True  # Flag untuk mengecek input kosong
                 # Title tambah film
-                print("==== Tambah Film ====")
-                print("Kosongkan isian untuk membatalkan penambahan film")
+                print("\n======== Tambah Film ========")
+                print("Kosongkan isian untuk membatalkan penambahan film\n")
 
                 # Input data film dan Loop hingga operasi selesai
                 while True:
                     judul = input("Judul \t\t: ").strip()
-                    kuota_penonton = input(
-                        "Kuota Penonton \t: ").strip()
+                    kuota_penonton = input("Kuota Penonton \t: ").strip()
 
                     # Jika input kosong, aktifkan flag
                     if not judul and not kuota_penonton:
@@ -139,7 +172,10 @@ def main():
                 addFilm(judul, int(kuota_penonton))
                 print("Film berhasil ditambah!")
 
-            case "0":  # Kembali ke menu utama
+            case "4. Laporan Penjualan Tiket":
+                pass
+
+            case "0. Keluar":  # Kembali ke menu utama
                 print("Program dihentikan.")
                 break
 

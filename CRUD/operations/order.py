@@ -11,42 +11,88 @@ Fungsi/fitur:
 ==========================================================
 """
 
+from rich.console import Console
+from rich.panel import Panel
+
+console = Console()
+
+
+# ------------------------------
+# Nama fungsi: display_seats
+# Penjelasan fungsi : Untuk menampilkan seat yang tersedia.
+# ------------------------------
+def display_seats(available_seats_list: list, total_seats: int = 60):
+    """
+    Menampilkan layout kursi bioskop
+    X = kursi terisi
+    """
+
+    all_seats = [f"K{i}" for i in range(1, total_seats + 1)]
+
+    console.print(
+        Panel(
+            "[bold white]LAYAR BIOSKOP[/bold white]", border_style="yellow", expand=True
+        )
+    )
+
+    for i in range(0, len(all_seats), 10):
+        row = []
+
+        for seat in all_seats[i : i + 10]:
+            if seat in available_seats_list:
+                row.append(f"[green]{seat:<5}[/green]")
+            else:
+                row.append(f"[red]{'X':<5}[/red]")
+
+        console.print("".join(row))
+
+
 # ------------------------------
 # Nama fungsi: orderKursi
 # Penjelasan fungsi : Untuk memilihkan kursi kosong untuk customer secara bebas.
 # ------------------------------
-
-
 def orderKursi(user_ticket: int, available_seats_list: list):
     """
     Order Kursi
 
     Args:
-        user_ticket (int) : Jumlah tiket yang diminta customer
-        available_seats_list (list) : List kursi yang tersedia
+        user_ticket (int): Jumlah tiket customer
+        available_seats_list (list): Kursi yang tersedia
 
-    Return:
-        user_ticket (int) : Jumlah tiket customer
-        selected_seats (list) : Kursi yang dipilih
+    Returns:
+        tuple: (jumlah tiket, kursi yang dipilih)
     """
 
-    # Menu
-    print("=== Kursi Tersedia ===")
-    print(available_seats_list)
+    selected_seats = []
 
-    # User select seats
-    selected_seats = []  # List to hold user's choice(s)
     for i in range(user_ticket):
-        while True:  # Loop until a valid seat is selected
-            select = input(f"\nPilih Kursi Tiket ke-{i + 1}: ").upper().strip()
-            # Transfer seat from available seat list if true
+        while True:
+            console.clear()
+
+            console.print(
+                Panel(
+                    f"[bold cyan]Pilih Kursi Tiket ke-{i + 1}[/bold cyan]",
+                    border_style="cyan",
+                )
+            )
+
+            display_seats(available_seats_list)
+
+            select = (
+                input(f"\nMasukkan kursi tiket ke-{i + 1} (contoh: K12): ")
+                .upper()
+                .strip()
+            )
+
             if select in available_seats_list:
                 available_seats_list.remove(select)
                 selected_seats.append(select)
                 break
-            # Print error if false
-            print("Kursi tidak valid / sudah terpakai.")
-    return user_ticket, selected_seats  # Return ticket amount and selected seats
+
+            console.print("[bold red]Kursi tidak valid / sudah terpakai.[/bold red]")
+            input("Tekan Enter untuk mencoba lagi...")
+
+    return user_ticket, selected_seats
 
 
 # ------------------------------
