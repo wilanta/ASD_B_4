@@ -21,13 +21,21 @@ console = Console()
 # Nama fungsi: display_seats
 # Penjelasan fungsi : Untuk menampilkan seat yang tersedia.
 # ------------------------------
-def display_seats(available_seats_list: list, total_seats: int = 60):
+def display_seats(available_seats_list: list):
     """
     Menampilkan layout kursi bioskop
-    X = kursi terisi
+    Hijau = tersedia
+    Merah (X) = terisi
     """
 
-    all_seats = [f"K{i}" for i in range(1, total_seats + 1)]
+    if not available_seats_list:
+        print("Tidak ada data kursi.")
+        return
+
+    # Ambil nomor kursi terbesar
+    max_seat = max(int(seat[1:]) for seat in available_seats_list)
+
+    all_seats = [f"K{i}" for i in range(1, max_seat + 1)]
 
     console.print(
         Panel(
