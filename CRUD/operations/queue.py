@@ -19,9 +19,6 @@ Method:
 ==========================================================
 """
 
-# Import pandas untuk menampilkan queue
-import pandas as pd
-
 # Untuk menampilkan table
 from rich.console import Console
 from rich.table import Table
