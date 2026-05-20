@@ -13,7 +13,6 @@ Fungsi/fitur:
 """
 
 # External
-import pandas as pd
 from rich import print
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
