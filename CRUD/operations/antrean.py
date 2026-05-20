@@ -230,11 +230,11 @@ def sistemAntrean(film_id: str):
 
             case "3. Lihat Antrean":  # Lihat Antrean
                 q.showQueue()
-                hold = input("[Tekan Enter untuk Kembali]")
+                input("[Tekan Enter untuk Kembali]")
 
             case "4. Lihat Data Pemesanan":  # Lihat Data Pemesanan
                 ll.showTickets()
-                hold = input("[Tekan Enter untuk Kembali]")
+                input("[Tekan Enter untuk Kembali]")
 
             case "5. Batalkan Antrean":  # Batalkan Antrean
                 # Jika antrean kosong, maka tidak ada data yang bisa dibatalkan
