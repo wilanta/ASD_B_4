@@ -22,6 +22,9 @@ from CRUD.operations.film import pilihFilm, addFilm, updateFilm, deleteFilm
 
 from CRUD.utils.dataOps import getAllData
 
+# Report
+from CRUD.operations.report import generateReport
+
 # Untuk interface
 from InquirerPy import inquirer
 from rich import print
@@ -173,7 +176,13 @@ def main():
                 print("Film berhasil ditambah!")
 
             case "4. Laporan Penjualan Tiket":
-                pass
+                data = getAllData("log_pemesanan")
+
+                if not data:
+                    print("Data log_pemesanan kosong!")
+                    return
+
+                generateReport(data)
 
             case "0. Keluar":  # Kembali ke menu utama
                 print("Program dihentikan.")
