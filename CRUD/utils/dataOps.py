@@ -18,11 +18,12 @@ def getAllData(data_name: str) -> dict:
     Mengambil semua row data dari database
 
     Args:
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", ATAU "data_antrean"
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", ATAU "temp_log_pemesanan"
 
     Returns:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
         "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
+        "temp_log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
         "data_antrean" -> {film_id: {'urutan_counter': int, 'nodes': [Node dict list]}}
     """
     data = {}
@@ -95,6 +96,15 @@ def getAllData(data_name: str) -> dict:
                         "judul": judul,
                         "date": date,
                     }
+                elif data_name.lower() == "temp_log_pemesanan":
+                    log_id, nama, jumlah_tiket, urutan_antrean, judul, date = list_row
+                    data[log_id] = {
+                        "nama": nama,
+                        "jumlah_tiket": jumlah_tiket,
+                        "urutan_antrean": urutan_antrean,
+                        "judul": judul,
+                        "date": date,
+                    }
 
     except FileNotFoundError:
         return data
@@ -153,14 +163,19 @@ def updateData(data_dict: dict, data_name: str):
 
     Args:
         data_dict (dict)
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", ATAU "data_antrean"
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", ATAU "temp_log_pemesanan"
 
     Returns :
     """
 
-    if data_name.lower() not in ["data_film", "log_pemesanan", "data_antrean"]:
+    if data_name.lower() not in [
+        "data_film",
+        "log_pemesanan",
+        "data_antrean",
+        "temp_log_pemesanan",
+    ]:
         raise ValueError(
-            "HANYA BOLEH DIISI DENGAN 'data_film', 'log_pemesanan', ATAU 'data_antrean'"
+            "HANYA BOLEH DIISI DENGAN 'data_film', 'log_pemesanan', 'data_antrean', ATAU 'temp_log_pemesanan'"
         )
 
     module_dir = os.path.dirname(__file__)
@@ -175,6 +190,17 @@ def updateData(data_dict: dict, data_name: str):
                     kuota_penonton = data_dict[film_id]["kuota_penonton"]
                     d.write(f"{film_id},{judul_film},{kuota_penonton}\n")
         elif data_name.lower() == "log_pemesanan":
+            with open(file_path, "w", encoding="utf-8") as d:
+                for log_id in data_dict.keys():
+                    nama = data_dict[log_id]["nama"]
+                    jumlah_tiket = data_dict[log_id]["jumlah_tiket"]
+                    urutan_antrean = data_dict[log_id]["urutan_antrean"]
+                    judul = data_dict[log_id]["judul"]
+                    date = data_dict[log_id]["date"]
+                    d.write(
+                        f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n"
+                    )
+        elif data_name.lower() == "temp_log_pemesanan":
             with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():
                     nama = data_dict[log_id]["nama"]
