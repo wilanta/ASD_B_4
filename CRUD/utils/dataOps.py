@@ -10,132 +10,130 @@ Fungsi/fitur:
 ==========================================================
 """
 
-# import libraries
 import os
 
-# ------------------------------
-# Nama fungsi: getAllData
-# Penjelasan fungsi : Mengembalikan seluruh isi data berupa dictionary.
-# 
-# Arguments : data_name (str) -> HANYA MENERIMA STRING BERUPA "data_film" ATAU "log_pemesanan".
-# Returns : dict -> Semua row data.
-# ------------------------------
+
 def getAllData(data_name: str) -> dict:
     """
     Mengambil semua row data dari database
-    
+
     Args:
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film" ATAU "log_pemesanan"
-    
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", ATAU "data_antrean"
+
     Returns:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
         "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
+        "data_antrean" -> {film_id: {'urutan_counter': int, 'nodes': [Node dict list]}}
     """
-    
-    # Menampung data dari database
     data = {}
-    
-    # Mengambil dan menentukan path penyimpanan data
     module_dir = os.path.dirname(__file__)
     file_path = os.path.join(module_dir, f"../data/{data_name}.txt")
     file_path = os.path.abspath(file_path)
-    
-    # Membuka file data berdasarkan data_name-nya untuk di-read
+
     try:
         with open(file_path, "r", encoding="utf-8") as d:
-            # Menambah dari satu per satu dari database ke dictionary
             for row in d:
-                # Bersihkan dari \n dan sisihkan data per field
                 row = row.strip()
+                if not row:
+                    continue
                 list_row = row.split(",")
-                
-                # Lewati data yang tidak lengkap sesuai dengan panjang field database
-                if (len(list_row) != 3 and data_name.lower() == "data_film") or (len(list_row) != 6 and data_name.lower() == "log_pemesanan"):
+
+                if data_name.lower() == "data_antrean":
+                    if list_row[0] == "COUNTER":
+                        film_id = list_row[1]
+                        counter = int(list_row[2])
+                        if film_id not in data:
+                            data[film_id] = {"urutan_counter": counter, "nodes": []}
+                        else:
+                            data[film_id]["urutan_counter"] = counter
+                    elif list_row[0] == "QUEUE":
+                        film_id = list_row[1]
+                        nama = list_row[2]
+                        jumlah_tiket = list_row[3] if list_row[3] != "" else None
+                        nomor_kursi = (
+                            list_row[4].split("|") if list_row[4] != "" else None
+                        )
+                        urutan_antrean = int(list_row[5])
+                        judul_film = list_row[6]
+                        date = list_row[7]
+                        next_nama = (
+                            list_row[8]
+                            if len(list_row) > 8 and list_row[8] != ""
+                            else None
+                        )
+                        node = {
+                            "nama": nama,
+                            "jumlah_tiket": jumlah_tiket,
+                            "nomor_kursi": nomor_kursi,
+                            "urutan_antrean": urutan_antrean,
+                            "judul_film": judul_film,
+                            "create_at": date,
+                            "next": next_nama,
+                        }
+                        if film_id not in data:
+                            data[film_id] = {"urutan_counter": 1, "nodes": []}
+                        data[film_id]["nodes"].append(node)
                     continue
 
-                # Memilih database sesuai yang diinputkan pada parameter
-                if data_name.lower() == "data_film": # Jika data_name:str berisi "data_film"
-                    # Menyimpan pecahan data ke masing-masing variable
+                if (len(list_row) != 3 and data_name.lower() == "data_film") or (
+                    len(list_row) != 6 and data_name.lower() == "log_pemesanan"
+                ):
+                    continue
+
+                if data_name.lower() == "data_film":
                     film_id, judul_film, kuota_penonton = list_row
-                    
-                    # Menambahkan satu per satu row data ke dictionary
                     data[film_id] = {
                         "judul_film": judul_film,
-                        "kuota_penonton": kuota_penonton 
+                        "kuota_penonton": kuota_penonton,
                     }
-                elif data_name.lower() == "log_pemesanan": # Jika data_name:str berisi "log_pemesanan"
-                    # Menyimpan pecahan data ke masing-masing variable
+                elif data_name.lower() == "log_pemesanan":
                     log_id, nama, jumlah_tiket, urutan_antrean, judul, date = list_row
-                    
-                    # Menambahkan satu per satu row data ke dictionary
                     data[log_id] = {
                         "nama": nama,
                         "jumlah_tiket": jumlah_tiket,
                         "urutan_antrean": urutan_antrean,
                         "judul": judul,
-                        "date": date
+                        "date": date,
                     }
-                else:
-                    return data
-    
-    # Error handling dan status ketika terjadi error saat pengambilan data
+
+    except FileNotFoundError:
+        return data
     except Exception as e:
         print(f"Gagal mengambil data | Error: {e}")
-    
+
     return data
 
 
-# ------------------------------
-# Nama fungsi: searchData
-# Penjelasan fungsi : Mengembalikan row data tunggal berdasarkan ID.
-# 
-# Arguments : 
-# 1. target_id (str)
-# 2. data_name (str)
-# 
-# Returns : dict -> row data tunggal berdasarkan ID.
-# ------------------------------
 def searchData(target_id: str, data_name: str) -> dict | None:
     """
     Mencari row data berdasarkan ID
-    
+
     Args:
         target_id (str)
         data_name (str): HANYA MENERIMA STRING BERUPA "data_film" ATAU "log_pemesanan"
-    
+
     Return:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
         "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
     """
-    
-    # Mengambil semua row data dari database
-    data = getAllData(data_name)
 
-    # Menampung hasil
+    data = getAllData(data_name)
     result = {}
-    
-    # Mencari ID dari database
+
     if target_id in data:
-        # Memastikan database yang mana untuk pengembalian
         if data_name.lower() == "data_film":
-            # Mengambil data dari ID yang terpilih
             judul_film = data[target_id]["judul_film"]
             kuota_penonton = data[target_id]["kuota_penonton"]
-            
-            # Memasukan data ke hasil untuk dikembalikan
             result[target_id] = {
                 "judul_film": judul_film,
-                "kuota_penonton": kuota_penonton
+                "kuota_penonton": kuota_penonton,
             }
         elif data_name.lower() == "log_pemesanan":
-            # Mengambil data dari ID yang terpilih
             nama = data[target_id]["nama"]
             jumlah_tiket = data[target_id]["jumlah_tiket"]
             urutan_antrean = data[target_id]["urutan_antrean"]
             judul = data[target_id]["judul"]
             date = data[target_id]["date"]
-            
-            # Memasukan data ke hasil untuk dikembalikan
             result[target_id] = {
                 "nama": nama,
                 "jumlah_tiket": jumlah_tiket,
@@ -145,64 +143,62 @@ def searchData(target_id: str, data_name: str) -> dict | None:
             }
     else:
         return None
-    
+
     return result
 
 
-# ------------------------------
-# Nama fungsi: updateData
-# Penjelasan fungsi : Melakukan penyimpanan data ke database.
-# 
-# Arguments : 
-# 1. data_dict (dict)
-# 2. data_name (str)
-# 
-# Returns :
-# ------------------------------
 def updateData(data_dict: dict, data_name: str):
     """
     Menyimpan data ke database
-    
+
     Args:
         data_dict (dict)
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film" ATAU "log_pemesanan"
-    
-    Returns : 
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", ATAU "data_antrean"
+
+    Returns :
     """
-    
-    # Memastikan data_name benar
-    if data_name.lower() not in ["data_film", "log_pemesanan"]:
-        raise ValueError("HANYA BOLEH DIISI DENGAN 'data_film' ATAU 'log_pemesanan'")
-    
-    # Mengambil dan menentukan path penyimpanan data
+
+    if data_name.lower() not in ["data_film", "log_pemesanan", "data_antrean"]:
+        raise ValueError(
+            "HANYA BOLEH DIISI DENGAN 'data_film', 'log_pemesanan', ATAU 'data_antrean'"
+        )
+
     module_dir = os.path.dirname(__file__)
     file_path = os.path.join(module_dir, f"../data/{data_name}.txt")
     file_path = os.path.abspath(file_path)
-    
-    # Memasukan data dari dict ke database
+
     try:
-        # Memastikan dalam database yang tepat
         if data_name.lower() == "data_film":
             with open(file_path, "w", encoding="utf-8") as d:
                 for film_id in data_dict.keys():
-                    # Menyimpan data dari dictionary untuk disimpan ke database
                     judul_film = data_dict[film_id]["judul_film"]
                     kuota_penonton = data_dict[film_id]["kuota_penonton"]
-                    
-                    # Menambahkan data ke database
                     d.write(f"{film_id},{judul_film},{kuota_penonton}\n")
         elif data_name.lower() == "log_pemesanan":
             with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():
-                    # Menyimpan data dari dictionary untuk disimpan ke database
                     nama = data_dict[log_id]["nama"]
                     jumlah_tiket = data_dict[log_id]["jumlah_tiket"]
                     urutan_antrean = data_dict[log_id]["urutan_antrean"]
                     judul = data_dict[log_id]["judul"]
                     date = data_dict[log_id]["date"]
-                    
-                    # Menambahkan data ke database
-                    d.write(f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n")
-    
+                    d.write(
+                        f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n"
+                    )
+        elif data_name.lower() == "data_antrean":
+            with open(file_path, "w", encoding="utf-8") as d:
+                for film_id, film_data in data_dict.items():
+                    d.write(f"COUNTER,{film_id},{film_data.get('urutan_counter', 1)}\n")
+                    for node in film_data.get("nodes", []):
+                        nomor_kursi_str = (
+                            "|".join(node["nomor_kursi"]) if node["nomor_kursi"] else ""
+                        )
+                        next_nama = node["next"] if node.get("next") else ""
+                        d.write(
+                            f"QUEUE,{film_id},{node['nama']},{node.get('jumlah_tiket', '')},"
+                            f"{nomor_kursi_str},{node['urutan_antrean']},"
+                            f"{node['judul_film']},{node['create_at']},{next_nama}\n"
+                        )
+
     except Exception as e:
         print(f"Gagal mengambil data | Error: {e}")

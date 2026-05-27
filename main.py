@@ -29,6 +29,7 @@ from CRUD.operations.report import generateReport
 from InquirerPy import inquirer
 from rich import print
 from rich.console import Console
+from rich.status import Status
 import shutil
 import time
 import sys
@@ -39,31 +40,6 @@ import os
 # Nama fungsi: main
 # Penjelasan fungsi : Untuk tampilan dan kontrol main menu.
 # ------------------------------
-
-# Clear screen helper
-_clear = lambda: os.system("cls" if sys.platform == "win32" else "clear")
-
-# Status messages mapped to action context
-_STATUS_MSGS = [
-    "Mohon tunggu sebentar...",
-    "Sedang memproses data...",
-    "Hampir selesai...",
-    "Menyimpan perubahan...",
-]
-
-
-# Spinner + ~3s delay helper using Rich Status
-def _processing(msg="Memproses"):
-    _clear()
-    console = Console()
-    with console.status(msg, spinner="dots") as status:
-        start = time.time()
-        i = 0
-        while time.time() - start < 3:
-            status.update(_STATUS_MSGS[i % len(_STATUS_MSGS)])
-            time.sleep(0.75)
-            i += 1
-    _clear()
 
 
 def main():
@@ -143,7 +119,7 @@ def main():
                         print("\n======== Ubah Film ========")
                         print("Judul \t\t:", film["judul_film"])
                         print("Kuota Penonton \t:", film["kuota_penonton"])
-                        print("\nKosongkan isian jika tidak ingin menggantiisi data")
+                        print("\nKosongkan isian jika tidak ingin mengganti isi data")
 
                         while True:
                             judul = input("Judul \t\t: ").strip()
@@ -234,6 +210,33 @@ def main():
                 print("Pilihan tidak valid!\n")
 
 
-# Untuk menjalankan fungsi main secara langsung
+# Clear screen helper
+def _clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+
+# Spinner + ~3s delay helper (using rich console spinner for consistency)
+def _processing(msg="Memproses"):
+    _clear()
+    console = Console()
+    messages = [
+        "Mohon tunggu sebentar...",
+        "Sedang memproses data...",
+        "Hampir selesai...",
+        "Menyimpan perubahan...",
+    ]
+    with console.status(
+        "[bold cyan]{}[/bold cyan]".format(msg), spinner="dots"
+    ) as status:
+        for i in range(15):
+            time.sleep(0.2)
+            status.update(
+                "[bold cyan]{}[/bold cyan]  [dim]{}[/dim]".format(
+                    msg, messages[i % len(messages)]
+                )
+            )
+    _clear()
+
+
 if __name__ == "__main__":
     main()

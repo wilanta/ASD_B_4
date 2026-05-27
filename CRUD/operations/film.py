@@ -21,6 +21,34 @@ from rich.table import Table
 from rich.panel import Panel
 import os
 import sys
+import time
+
+
+def _clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+
+def _processing(msg="Memproses", detail="Mohon tunggu sebentar..."):
+    _clear()
+    console = Console()
+    messages = [
+        detail,
+        "Mohon tunggu sebentar...",
+        "Sedang memproses data...",
+        "Hampir selesai...",
+        "Menyimpan perubahan...",
+    ]
+    with console.status(
+        "[bold cyan]{}[/bold cyan]".format(msg), spinner="dots"
+    ) as status:
+        for i in range(15):
+            time.sleep(0.2)
+            status.update(
+                "[bold cyan]{}[/bold cyan]  [dim]{}[/dim]".format(
+                    msg, messages[i % len(messages)]
+                )
+            )
+    _clear()
 
 
 # Utilities
@@ -31,11 +59,6 @@ from CRUD.utils.dataOps import getAllData, updateData
 # Nama fungsi: pilihFilm
 # Penjelasan fungsi : Untuk memilih film yang akan dimanage sistem anterannya.
 # ------------------------------
-
-
-# Clear screen helper
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
 
 
 def pilihFilm() -> str | None:
@@ -146,6 +169,7 @@ def deleteFilm(film_id):
 
     # Message status
     if deleted:
+        _clear()
         print(f'Film "{deleted["judul_film"]}", berhasil dihapus!')
 
         # Rewritte pada database

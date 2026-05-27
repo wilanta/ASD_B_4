@@ -8,7 +8,6 @@ Class:
 ==========================================================
 """
 
-# Import datetime untuk mencatat waktu pembuatan record
 from datetime import datetime
 
 
@@ -40,7 +39,11 @@ class Node:
         nomor_kursi: list = None,
         urutan_antrean: int = None,
         judul_film: str = None,
+        film_id: str = None,
+        customer_id: str = None,
     ):
+        self.customer_id = customer_id
+        self.film_id = film_id
         self.nama = nama.lower()
         self.jumlah_tiket = jumlah_tiket
         self.nomor_kursi = nomor_kursi

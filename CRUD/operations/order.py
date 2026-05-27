@@ -13,14 +13,29 @@ Fungsi/fitur:
 
 from rich.console import Console
 from rich.panel import Panel
+import os
+import sys
+import time
 
 console = Console()
 
 
-# ------------------------------
-# Nama fungsi: display_seats
-# Penjelasan fungsi : Untuk menampilkan seat yang tersedia.
-# ------------------------------
+def _clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+
+def _processing(msg="Memproses"):
+    _clear()
+    symbols = ["|", "/", "-", "\\"]
+    start = time.time()
+    i = 0
+    while time.time() - start < 3:
+        print(f"\r{msg} {symbols[i % len(symbols)]}", end="", flush=True)
+        time.sleep(0.15)
+        i += 1
+    _clear()
+
+
 def display_seats(available_seats_list: list):
     """
     Menampilkan layout kursi bioskop
@@ -32,7 +47,6 @@ def display_seats(available_seats_list: list):
         print("Tidak ada data kursi.")
         return
 
-    # Ambil nomor kursi terbesar
     max_seat = max(int(seat[1:]) for seat in available_seats_list)
 
     all_seats = [f"K{i}" for i in range(1, max_seat + 1)]
@@ -56,17 +70,12 @@ def display_seats(available_seats_list: list):
             else:
                 row.append(f"[red]{'X':<5}[/red]")
 
-            # Tambah space setelah kursi ke-5
             if idx == 4:
                 row.append(" " * 6)
 
         console.print(" ".join(row))
 
 
-# ------------------------------
-# Nama fungsi: orderKursi
-# Penjelasan fungsi : Untuk memilihkan kursi kosong untuk customer secara bebas.
-# ------------------------------
 def orderKursi(user_ticket: int, available_seats_list: list):
     """
     Order Kursi
@@ -83,7 +92,7 @@ def orderKursi(user_ticket: int, available_seats_list: list):
 
     for i in range(user_ticket):
         while True:
-            console.clear()
+            _clear()
 
             console.print(
                 Panel(
@@ -111,16 +120,10 @@ def orderKursi(user_ticket: int, available_seats_list: list):
     return user_ticket, selected_seats
 
 
-# ------------------------------
-# Nama fungsi: resetOrder
-# Penjelasan fungsi : Untuk mereset sistem antrean menjadi 0 antrean kembali.
-# ------------------------------
 def resetOrder(queue, ticket):
-    # reset queue
     queue.front = None
     queue.rear = None
     queue.urutan = 1
 
-    # reset ticket
     ticket.head = None
     ticket.tail = None

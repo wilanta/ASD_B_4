@@ -64,7 +64,7 @@ def generateReport(transaction_data):
     """
 
     if not transaction_data:
-        print("Tidak ada data transaksi untuk dibuatkan laporan.")
+        print("[bold red]Tidak ada data transaksi untuk dibuatkan laporan.[/bold red]")
         return
 
     sales_analysis = analyze(transaction_data)

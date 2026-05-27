@@ -14,10 +14,30 @@ Fungsi/fitur:
 
 from CRUD.utils.node import Node
 from CRUD.utils.seatSort import seat_sort
+from CRUD.utils.dataOps import getAllData
 
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+import os
+import sys
+import time
+
+
+def _clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+
+def _processing(msg="Memproses"):
+    _clear()
+    symbols = ["|", "/", "-", "\\"]
+    start = time.time()
+    i = 0
+    while time.time() - start < 3:
+        print(f"\r{msg} {symbols[i % len(symbols)]}", end="", flush=True)
+        time.sleep(0.15)
+        i += 1
+    _clear()
 
 
 # ````````````````````````````````````````````
