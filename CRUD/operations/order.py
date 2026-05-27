@@ -39,20 +39,28 @@ def display_seats(available_seats_list: list):
 
     console.print(
         Panel(
-            "[bold white]LAYAR BIOSKOP[/bold white]", border_style="yellow", expand=True
+            "[bold white]LAYAR BIOSKOP[/bold white]",
+            border_style="yellow",
+            expand=True,
         )
     )
 
     for i in range(0, len(all_seats), 10):
         row = []
 
-        for seat in all_seats[i : i + 10]:
+        current_row = all_seats[i : i + 10]
+
+        for idx, seat in enumerate(current_row):
             if seat in available_seats_list:
                 row.append(f"[green]{seat:<5}[/green]")
             else:
                 row.append(f"[red]{'X':<5}[/red]")
 
-        console.print("".join(row))
+            # Tambah space setelah kursi ke-5
+            if idx == 4:
+                row.append(" " * 6)
+
+        console.print(" ".join(row))
 
 
 # ------------------------------

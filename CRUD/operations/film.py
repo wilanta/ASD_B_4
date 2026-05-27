@@ -16,6 +16,9 @@ Fungsi/fitur:
 from rich import print
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
 
 
 # Utilities
@@ -46,6 +49,19 @@ def pilihFilm() -> str | None:
     # Memasukan judul film ke list
     title_list = [data["judul_film"] for data in data_film.values()]
     title_list.append(Choice(value=None, name="--- Keluar ---"))
+
+    # Validasi apakah film ada
+    if data_film == {}:
+        # Status film kosong
+        console = Console()
+
+        console.print(
+            Panel(
+                "[bold red]Film kosong![/bold red]",
+                title="[bold red]Daftar Film[/bold red]",
+                border_style="red",
+            )
+        )
 
     # Menampilkan pilihan dan meminta pilihan dari user
     choice = inquirer.select(

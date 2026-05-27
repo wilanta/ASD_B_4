@@ -76,11 +76,18 @@ class Ticket:
     def showTickets(self):
         "Menunjukkan daftar pemesanan tiket."
 
-        if self.isEmpty():
-            print("Data masih kosong.")
-            return
-
         console = Console()
+
+        # Jika antrean kosong
+        if self.isEmpty():
+            console.print(
+                Panel(
+                    "[bold red]Pemesanan kosong![/bold red]",
+                    title="[bold red]Daftar Pemesanan[/bold red]",
+                    border_style="red",
+                )
+            )
+            return
 
         table = Table(title="Daftar Pemesanan Tiket", expand=False)
 

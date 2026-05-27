@@ -154,17 +154,19 @@ def main():
 
                 # Input data film dan Loop hingga operasi selesai
                 while True:
-                    judul = input("Judul \t\t: ").strip()
-                    kuota_penonton = input("Kuota Penonton \t: ").strip()
+                    judul = input("Judul \t\t\t\t: ").strip()
+                    kuota_penonton = input("Kuota Penonton (maks: 60)\t: ").strip()
 
                     # Jika input kosong, aktifkan flag
                     if not judul and not kuota_penonton:
                         break
                     # Validasi kuota penonton harus berupa angka
-                    if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 100:
+                    if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 60:
                         empty = not empty
                         break
-                    print("Kuota penonton harus berupa angka valid!")
+                    print(
+                        "Kuota penonton harus berupa angka yang valid dan maksimal 60 orang!\n"
+                    )
 
                 # Jika tidak diberi input, batalkan penambahan film
                 if empty:
