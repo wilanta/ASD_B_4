@@ -36,6 +36,35 @@ from rich.console import Console
 from rich.panel import Panel
 from InquirerPy import inquirer
 from rich import print
+import os
+import sys
+import time
+
+# Clear screen helper
+_clear = lambda: os.system("cls" if sys.platform == "win32" else "clear")
+
+# Status messages for spinning display
+_STATUS_MSGS = [
+    "Mohon tunggu sebentar...",
+    "Sedang memproses data...",
+    "Hampir selesai...",
+    "Memproses permintaan...",
+]
+
+
+# Spinner + ~3s delay helper using Rich Status
+def _processing(msg="Memproses"):
+    _clear()
+    console = Console()
+    with console.status(msg, spinner="dots") as status:
+        start = time.time()
+        i = 0
+        while time.time() - start < 3:
+            status.update(_STATUS_MSGS[i % len(_STATUS_MSGS)])
+            time.sleep(0.75)
+            i += 1
+    _clear()
+
 
 # ------------------------------
 # Nama fungsi: sistemAntrean
@@ -43,8 +72,24 @@ from rich import print
 # ------------------------------
 
 
+def _error(msg: str):
+    _clear()
+    console = Console()
+    console.print(
+        Panel(
+            f"[bold red]{msg}[/bold red]",
+            title="[bold red]Gagal[/bold red]",
+            border_style="red",
+            padding=(1, 2),
+        )
+    )
+    input("\n[Tekan Enter untuk kembali]")
+
+
 def sistemAntrean(film_id: str):
     "Menu Sistem Antrean"
+
+    _clear()
 
     # Mengambil data film dari database
     film_dict = searchData(film_id, "data_film")
@@ -109,6 +154,7 @@ def sistemAntrean(film_id: str):
         match choice:
             case "1. Masuk Antrean":  # Masuk Antrean
                 # Memeriksa ketersediaan tiket sebelum memasukan penonton ke antrean
+                _clear()
                 if available_ticket > 0:
                     empty = True
 
@@ -135,21 +181,21 @@ def sistemAntrean(film_id: str):
                         print("Antrean dibatalkan.")
                         continue
 
-                    # Menambahkan penonton ke antrean
+                    _processing("Menambahkan ke antrean...")
                     q.enqueue(nama_penonton)
 
+                    _clear()
                     print(f"{nama_penonton} masuk antrean.")
                 else:
                     print("Antrean Penuh, tiket habis!")
 
             case "2. Layani Antrean":  # Layani Antrean
-                # Jika antrean kosong, maka tidak ada yang bisa dilayani
                 if q.isEmpty():
-                    print("Antrean kosong, tidak ada yang bisa dilayani!")
+                    _error("Antrean kosong, tidak ada yang bisa dilayani!")
                     continue
 
                 if available_ticket < 1:
-                    print("Tiket habis, tidak ada yang bisa dilayani!")
+                    _error("Tiket habis, tidak ada yang bisa dilayani!")
                     continue
 
                 # Menentukan jumlah max tiket yang bisa dipesan per customer
@@ -175,6 +221,9 @@ def sistemAntrean(film_id: str):
 
                     except ValueError:
                         print("Masukkan bilangan yang valid!")
+
+                _processing("Memproses pesanan...")
+                _clear()
 
                 # Mengambil data jumlah_tiket dan nomor_kursi dari user
                 ticket_amount, selected_seat = orderKursi(user_ticket, available_seat)
@@ -224,22 +273,24 @@ def sistemAntrean(film_id: str):
                 # Hapus customer yang telah dilayani dari antrean
                 served_node = q.dequeue()
 
+                _clear()
                 print(
                     f"\n[cyan]Invoice berhasil dicetak | {served_node.nama} telah dilayani![/cyan]\n"
                 )
 
             case "3. Lihat Antrean":  # Lihat Antrean
+                _clear()
                 q.showQueue()
                 input("[Tekan Enter untuk Kembali]")
 
             case "4. Lihat Data Pemesanan":  # Lihat Data Pemesanan
+                _clear()
                 ll.showTickets()
                 input("[Tekan Enter untuk Kembali]")
 
             case "5. Batalkan Antrean":  # Batalkan Antrean
-                # Jika antrean kosong, maka tidak ada data yang bisa dibatalkan
                 if q.isEmpty():
-                    print("Antrean kosong, tidak ada data yang bisa dibatalkan!")
+                    _error("Antrean kosong, tidak ada data yang bisa dibatalkan!")
                     continue
 
                 # Meminta inputan nama customer dari user
@@ -264,17 +315,17 @@ def sistemAntrean(film_id: str):
                 canceled_user, canceled_urutan = q.cancelQueue(nama)
                 # Hapus customer dari antrean
                 if not canceled_user:
-                    print("Nama tidak ditemukan.")
+                    _error("Nama tidak ditemukan.")
                     continue
 
+                _clear()
                 print(
                     f"Antrean atas nama {canceled_user}{f' dengan urutan {canceled_urutan}' if canceled_urutan else ''} berhasil dibatalkan."
                 )
 
             case "6. Hapus Data Pemesanan":  # Hapus Data Pemesanan
-                # Jika data pemesanan kosong, maka tidak ada data yang bisa dibatalkan
                 if ll.isEmpty():
-                    print("Data pemesanan kosong, tidak ada data yang bisa dibatalkan!")
+                    _error("Data pemesanan kosong, tidak ada data yang bisa dibatalkan!")
                     continue
 
                 while True:
@@ -296,29 +347,27 @@ def sistemAntrean(film_id: str):
                     continue
 
                 # Hapus customer dari node linked list data pemesanan dan field log_pemesanan
+                _processing("Menghapus pemesanan...")
                 refunded_ticket, refunded_seat = ll.deleteTicket(nama)
 
                 # Cek apakah nama berada di list
-                if not refunded_ticket:
-                    print("Nama tidak ditemukan.")
+                if refunded_ticket is None:
+                    _error("Nama tidak ditemukan.")
                     continue
 
                 # Tambahkan kembali tiket dan kursi tersedia
                 available_ticket += refunded_ticket
 
-                # Mengandung function untuk sort kursi
-                # Karena kalau langsung di-extend, akan menjadi berantakan
-                available_seat.extend(
-                    refunded_seat
-                )  # Tambah kursi yang dipesan ke available seat
+                available_seat.extend(refunded_seat)
                 available_seat = seat_sort(available_seat)
 
+                _clear()
                 print("Pemesanan berhasil dibatalkan!")
 
             case "7. Cari Data Pemesanan":  # Cari Data Pemesanan
-                # Jika data pemesanan kosong, keluar dari search
+                _clear()
                 if ll.isEmpty():
-                    print("Data pemesanan kosong, tidak ada data yang bisa dicari!")
+                    _error("Data pemesanan kosong, tidak ada data yang bisa dicari!")
                     continue
 
                 while True:
@@ -341,9 +390,10 @@ def sistemAntrean(film_id: str):
 
                 # Cari data di node linked list pemesanan / ticket
                 if not ll.searchTicket(nama):
-                    print("Nama tidak ditemukan.")
+                    _error("Nama tidak ditemukan.")
 
             case "8. Reset Antrean dan Pemesanan":  # Reset Antrean dan Pemesanan
+                _processing("Mereset antrean...")
                 # Call Function Reset
                 resetOrder(queue=q, ticket=ll)
 
@@ -354,9 +404,11 @@ def sistemAntrean(film_id: str):
                     for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
                 ]
 
+                _clear()
                 print("Antrean dan pemesanan berhasil di-reset.\n")
 
             case "0. Kembali":  # Kembali ke menu utama
+                _clear()
                 print("Kembali ke menu utama.")
                 break
 

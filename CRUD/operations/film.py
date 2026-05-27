@@ -19,6 +19,8 @@ from InquirerPy.base.control import Choice
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+import os
+import sys
 
 
 # Utilities
@@ -31,6 +33,11 @@ from CRUD.utils.dataOps import getAllData, updateData
 # ------------------------------
 
 
+# Clear screen helper
+def _clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+
 def pilihFilm() -> str | None:
     """
     Memilih film dan mengembalikan string ID film dari database.
@@ -38,6 +45,7 @@ def pilihFilm() -> str | None:
     Return:
         id (str): id film.
     """
+    _clear()
 
     # Menampilkan header
     print("\n\n[bold white]Pilih Film[/bold white]")

@@ -28,16 +28,47 @@ from CRUD.operations.report import generateReport
 # Untuk interface
 from InquirerPy import inquirer
 from rich import print
+from rich.console import Console
 import shutil
+import time
+import sys
+import os
 
 
 # ------------------------------
 # Nama fungsi: main
 # Penjelasan fungsi : Untuk tampilan dan kontrol main menu.
 # ------------------------------
+
+# Clear screen helper
+_clear = lambda: os.system("cls" if sys.platform == "win32" else "clear")
+
+# Status messages mapped to action context
+_STATUS_MSGS = [
+    "Mohon tunggu sebentar...",
+    "Sedang memproses data...",
+    "Hampir selesai...",
+    "Menyimpan perubahan...",
+]
+
+
+# Spinner + ~3s delay helper using Rich Status
+def _processing(msg="Memproses"):
+    _clear()
+    console = Console()
+    with console.status(msg, spinner="dots") as status:
+        start = time.time()
+        i = 0
+        while time.time() - start < 3:
+            status.update(_STATUS_MSGS[i % len(_STATUS_MSGS)])
+            time.sleep(0.75)
+            i += 1
+    _clear()
+
+
 def main():
-    # menampilkam menu utama secara berulang sampai user memilih untuk keluar
     while True:
+        _clear()
         print("""
 [bold white]
 ██████╗ ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗      ██████╗ █████╗  ██████╗██████╗
@@ -79,11 +110,14 @@ def main():
 
                 # Memanggil fungsi sistem antrean
                 if film_id:
+                    _clear()
                     sistemAntrean(film_id)
                 else:
+                    _clear()
                     print("Tidak sesuai nomor di urutan. Kembali ke menu utama...")
 
             case "2. Daftar Film":  # Show film
+                _clear()
                 film_id = pilihFilm()
 
                 # Film_id validator
@@ -106,18 +140,15 @@ def main():
                     case "1. Update":  # Update Film
                         film = getAllData("data_film").get(film_id)
 
-                        # Title ubah film
                         print("\n======== Ubah Film ========")
                         print("Judul \t\t:", film["judul_film"])
                         print("Kuota Penonton \t:", film["kuota_penonton"])
-                        print("\nKosongkan isian jika tidak ingin mengganti isi data")
+                        print("\nKosongkan isian jika tidak ingin menggantiisi data")
 
-                        # Input data film dan Loop hingga operasi selesai
                         while True:
                             judul = input("Judul \t\t: ").strip()
                             kuota_penonton = input("Kuota Penonton \t: ").strip()
 
-                            # Validasi kuota penonton harus berupa angka
                             if not kuota_penonton or (
                                 kuota_penonton.isdigit()
                                 and 0 < int(kuota_penonton) <= 100
@@ -125,42 +156,44 @@ def main():
                                 break
                             print("Kuota penonton harus berupa angka valid!")
 
-                        # Ubah data film di database
+                        _processing("Menyimpan perubahan...")
                         updateFilm(
                             judul_film=judul,
                             kuota_penonton=kuota_penonton,
                             film_id=film_id,
                         )
 
-                        print("Film berhasil diubah!")
+                        _clear()
+                        print("\nFilm berhasil diubah!")
 
                     case "2. Delete":  # Delete Film
+                        _processing("Menghapus film...")
                         deleteFilm(film_id)
 
+                        _clear()
                         print("Film berhasil dihapus!")
 
                     case "0. Kembali":  # Kembali ke menu utama
+                        _clear()
                         print("Kembali ke menu utama.")
                         continue
 
                     case _:  # Pilihan tidak valid
                         print("Pilihan tidak valid!")
+                        continue
 
             case "3. Tambah Film":  # Tambah Film
-                empty = True  # Flag untuk mengecek input kosong
-                # Title tambah film
+                _clear()
+                empty = True
                 print("\n======== Tambah Film ========")
                 print("Kosongkan isian untuk membatalkan penambahan film\n")
 
-                # Input data film dan Loop hingga operasi selesai
                 while True:
                     judul = input("Judul \t\t\t\t: ").strip()
                     kuota_penonton = input("Kuota Penonton (maks: 60)\t: ").strip()
 
-                    # Jika input kosong, aktifkan flag
                     if not judul and not kuota_penonton:
                         break
-                    # Validasi kuota penonton harus berupa angka
                     if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 60:
                         empty = not empty
                         break
@@ -168,25 +201,32 @@ def main():
                         "Kuota penonton harus berupa angka yang valid dan maksimal 60 orang!\n"
                     )
 
-                # Jika tidak diberi input, batalkan penambahan film
                 if empty:
                     print("Membatalkan penambahan film...")
                     continue
 
-                # Tambahkan film baru ke database
+                _processing("Menyimpan film...")
                 addFilm(judul, int(kuota_penonton))
+
+                _clear()
                 print("Film berhasil ditambah!")
 
             case "4. Laporan Penjualan Tiket":
+                _clear()
                 data = getAllData("log_pemesanan")
 
                 if not data:
                     print("Data log_pemesanan kosong!")
-                    return
+                    continue
 
+                _processing("Membuat laporan...")
                 generateReport(data)
 
+                _clear()
+                print("Laporan berhasil dibuat!")
+
             case "0. Keluar":  # Kembali ke menu utama
+                _clear()
                 print("Program dihentikan.")
                 break
 
