@@ -19,13 +19,14 @@ def getAllData(data_name: str) -> dict:
     Mengambil semua row data dari database
 
     Args:
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", ATAU "temp_log_pemesanan"
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", "temp_seat", ATAU "temp_log_pemesanan"
 
     Returns:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
         "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
         "temp_log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
         "data_antrean" -> {film_id: {'urutan_counter': int, 'nodes': [Node dict list]}}
+        "temp_seat" -> {film_id: {'judul_film': str, 'available_seat': [List kursi]}}
     """
     data = {}
     module_dir = os.path.dirname(__file__)
@@ -106,6 +107,12 @@ def getAllData(data_name: str) -> dict:
                         "judul": judul,
                         "date": date,
                     }
+                elif data_name.lower() == "temp_seat":
+                    film_id, judul_film, *available_seat = list_row
+                    data[film_id] = {
+                        "judul_film": judul_film,
+                        "available_seat": available_seat,
+                    }
 
     except FileNotFoundError:
         return data
@@ -121,11 +128,12 @@ def searchData(target_id: str, data_name: str) -> dict | None:
 
     Args:
         target_id (str)
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film" ATAU "log_pemesanan"
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", ATAU "temp_seat"
 
     Return:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
         "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
+        "temp_seat" -> {film_id: {'judul_film': str, 'available_seat': [List kursi]}}
     """
 
     data = getAllData(data_name)
@@ -152,6 +160,13 @@ def searchData(target_id: str, data_name: str) -> dict | None:
                 "judul": judul,
                 "date": date,
             }
+        elif data_name.lower() == "temp_seat":
+            judul_film = data[target_id]["judul_film"]
+            available_seat = data[target_id]["available_seat"]
+            result[target_id] = {
+                "judul_film": judul_film,
+                "available_seat": available_seat,
+            }
     else:
         return None
 
@@ -164,7 +179,7 @@ def updateData(data_dict: dict, data_name: str):
 
     Args:
         data_dict (dict)
-        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", ATAU "temp_log_pemesanan"
+        data_name (str): HANYA MENERIMA STRING BERUPA "data_film", "log_pemesanan", "data_antrean", 'temp_seat', ATAU "temp_log_pemesanan"
 
     Returns :
     """
@@ -174,9 +189,10 @@ def updateData(data_dict: dict, data_name: str):
         "log_pemesanan",
         "data_antrean",
         "temp_log_pemesanan",
+        "temp_seat",
     ]:
         raise ValueError(
-            "HANYA BOLEH DIISI DENGAN 'data_film', 'log_pemesanan', 'data_antrean', ATAU 'temp_log_pemesanan'"
+            "HANYA BOLEH DIISI DENGAN 'data_film', 'log_pemesanan', 'data_antrean', 'temp_seat', ATAU 'temp_log_pemesanan'"
         )
 
     module_dir = os.path.dirname(__file__)
@@ -201,6 +217,15 @@ def updateData(data_dict: dict, data_name: str):
                     d.write(
                         f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n"
                     )
+        elif data_name.lower() == "temp_seat":
+            with open(file_path, "w", encoding="utf-8") as d:
+                for film_id in data_dict.keys():
+                    judul_film = data_dict[film_id]["judul_film"]
+                    available_seat = data_dict[film_id]["available_seat"]
+
+                    row_field = ",".join([film_id, judul_film] + available_seat)
+                    print("helo world dajinduabdyuadgauv bway")
+                    d.write(f"{row_field}\n")
         elif data_name.lower() == "temp_log_pemesanan":
             with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():

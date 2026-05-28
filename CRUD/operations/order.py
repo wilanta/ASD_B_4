@@ -81,7 +81,7 @@ def orderKursi(user_ticket: int, available_seats_list: list):
         available_seats_list (list): List kursi yang masih tersedia.
 
     Returns:
-        tuple: (jumlah tiket, list kursi yang dipilih).
+        tuple: (jumlah tiket, list kursi yang dipilih, list kursi tersisa).
     """
 
     selected_seats = []
@@ -113,7 +113,7 @@ def orderKursi(user_ticket: int, available_seats_list: list):
             console.print("[bold red]Kursi tidak valid / sudah terpakai.[/bold red]")
             input("Tekan Enter untuk mencoba lagi...")
 
-    return user_ticket, selected_seats
+    return user_ticket, selected_seats, available_seats_list
 
 
 # ------------------------------

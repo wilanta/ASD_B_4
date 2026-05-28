@@ -77,10 +77,12 @@ def _load_queue(film_id: str, judul_film: str) -> Queue:
                 judul_film=node_dict.get("judul_film", judul_film),
             )
             node.create_at = node_dict.get("create_at", node.create_at)
+
             if prev is None:
                 q.front = node
             else:
                 prev.next = node
+
             prev = node
 
         q.rear = prev if prev else None
@@ -101,9 +103,12 @@ def _save_queue(film_id: str, q: Queue):
         film_id (str): ID film.
         q (Queue): Objek queue yang state-nya akan disimpan.
     """
+
     # Mengumpulkan semua node menjadi list dictionary
     nodes_list = []
+
     current = q.front
+
     while current is not None:
         nodes_list.append(
             {
@@ -116,17 +121,20 @@ def _save_queue(film_id: str, q: Queue):
                 "next": current.next.nama if current.next else None,
             }
         )
+
         current = current.next
 
     # Membaca data lama, menambahkan/memperbarui entry film ini, lalu menyimpan
     data = getAllData("data_antrean")
-    data[film_id] = {"urutan_counter": q.urutan, "nodes": nodes_list}
+
+    data[film_id] = {
+        "urutan_counter": q.urutan,
+        "nodes": nodes_list,
+    }
+
     updateData(data, "data_antrean")
 
 
-# ------------------------------
-# Nama fungsi: _load_tickets
-# Penjelasan fungsi : Untuk memuat data pemesanan dari log_pemesanan.txt ke linked list Ticket.
 # ------------------------------
 # Nama fungsi: _load_tickets
 # Penjelasan fungsi : Memuat data pemesanan dari temp_log_pemesanan.txt
@@ -137,20 +145,26 @@ def _load_tickets(film_id: str, judul_film: str, ll: Ticket):
     Memuat record pemesanan dari file ke linked list Ticket.
 
     Args:
-        film_id (str): ID film (tidak digunakan langsung, digunakan judul_film untuk filter).
+        film_id (str): ID film.
         judul_film (str): Judul film sebagai kunci penyaringan record.
         ll (Ticket): Objek Ticket linked list sebagai target muat data.
     """
+
     log = getAllData("temp_log_pemesanan")
+
     for record in log.values():
         if record.get("judul") == judul_film:
             kursi_raw = record.get("nomor_kursi")
+
             if isinstance(kursi_raw, str):
                 nomor_kursi = [k.strip() for k in kursi_raw.split("|") if k.strip()]
+
             elif isinstance(kursi_raw, list):
                 nomor_kursi = kursi_raw
+
             else:
                 nomor_kursi = []
+
             ll.addTicket(
                 nama=record.get("nama", ""),
                 jumlah_tiket=int(record.get("jumlah_tiket", 0)),
@@ -165,52 +179,61 @@ def _load_tickets(film_id: str, judul_film: str, ll: Ticket):
 # Penjelasan fungsi : Menyimpan state Ticket linked list saat ini
 # ke temp_log_pemesanan.txt (hanya records film ini).
 # ------------------------------
-log_pemesanan_ID = generateID()
-
-
-def _save_tickets(film_id: str, judul_film: str, ll: Ticket, restored_log: dict):
+def _save_tickets(judul_film: str, ll: Ticket):
     """
-    Menyimpan state Ticket linked list ke file temp_log_pemesanan.txt.
+    Menyimpan state terbaru linked list Ticket
+    ke temp_log_pemesanan tanpa menduplikasi data lama.
 
     Args:
-        film_id (str): ID film.
-        judul_film (str): Judul film sebagai filter record.
-        ll (Ticket): Objek linked list Ticket yang akan disimpan.
-        restored_log (dict): Log yang dibaca sebelumnya untuk disatukan.
+        judul_film (str): Judul film.
+        ll (Ticket): Objek linked list Ticket.
     """
-    # Mengumpulkan records dari linked list
+
+    # Mengambil semua data lama
+    temp_log = getAllData("temp_log_pemesanan")
+
+    # Menghapus semua data film yang sama
+    temp_log = {
+        log_id: data
+        for log_id, data in temp_log.items()
+        if data.get("judul") != judul_film
+    }
+
+    # Menentukan ID terakhir
+    last_id = 0
+
+    for log_id in temp_log.keys():
+        try:
+            num = int(log_id.replace("LOG", ""))
+
+            if num > last_id:
+                last_id = num
+
+        except:
+            pass
+
+    # Traversal linked list
     current = ll.head
-    film_records = {}
+
     while current is not None:
-        film_records[current.nama] = {
+        # Membuat ID baru
+        last_id += 1
+        new_log_id = f"LOG{last_id}"
+
+        # Menambahkan state terbaru
+        temp_log[new_log_id] = {
             "nama": current.nama,
             "jumlah_tiket": str(current.jumlah_tiket),
             "urutan_antrean": str(current.urutan_antrean),
             "judul": current.judul_film,
+            "nomor_kursi": current.nomor_kursi,
             "date": str(current.create_at),
         }
+
         current = current.next
 
-    for log_id, record in restored_log.items():
-        if record.get("judul") != judul_film:
-            film_records[record.get("nama", "") + "_" + log_id] = {
-                "nama": record.get("nama", ""),
-                "jumlah_tiket": record.get("jumlah_tiket", ""),
-                "urutan_antrean": record.get("urutan_antrean", ""),
-                "judul": record.get("judul", ""),
-                "date": record.get("date", ""),
-            }
-
-    result = {}
-    for key, val in restored_log.items():
-        if val.get("judul") == judul_film:
-            continue
-        result[key] = val
-
-    for record in film_records.values():
-        result[log_pemesanan_ID] = record
-
-    updateData(result, "temp_log_pemesanan")
+    # Simpan kembali ke file/database
+    updateData(temp_log, "temp_log_pemesanan")
 
 
 # ------------------------------
@@ -225,11 +248,11 @@ def deleteTempPemesanan(judul_film: str):
     Args:
         judul_film (str): Judul film yang record-nya akan dihapus.
     """
+
     # Mengambil semua data dari database
     temp_pemesanan_data = getAllData("temp_log_pemesanan")
 
     # Menyaring data agar hanya menyisakan record yang BUKAN film ini
-    # Record dengan judul yang cocok akan dihapus
     temp_pemesanan_data = {
         log_id: data
         for log_id, data in temp_pemesanan_data.items()
@@ -240,6 +263,32 @@ def deleteTempPemesanan(judul_film: str):
 
 
 # ------------------------------
+# Nama fungsi: deleteTempSeat
+# Penjelasan fungsi : Menghapus semua record pemesanan sementara
+# dari temp_seat.txt berdasarkan judul film.
+# ------------------------------
+def deleteTempSeat(judul_film: str):
+    """
+    Menghapus record seat berdasarkan judul film.
+
+    Args:
+        judul_film (str): Judul film yang record-nya akan dihapus.
+    """
+
+    # Mengambil semua data dari database
+    temp_seat_data = getAllData("temp_seat")
+
+    # Menyaring data agar hanya menyisakan record yang BUKAN film ini
+    temp_seat_data = {
+        log_id: data
+        for log_id, data in temp_seat_data.items()
+        if data["judul_film"] != judul_film
+    }
+
+    updateData(temp_seat_data, "temp_seat")
+
+
+# ------------------------------
 # Nama fungsi: sistemAntrean
 # Penjelasan fungsi : Untuk memanage sistem antrian suatu film bioskop.
 # ------------------------------
@@ -247,32 +296,61 @@ def sistemAntrean(film_id: str):
     """Menu Sistem Antrean"""
 
     film_dict = searchData(film_id, "data_film")
-    available_ticket = int(film_dict[film_id]["kuota_penonton"])
-    available_seat = [
-        "K" + str(i) for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
-    ]
+
+    # Load available seat
+    temp_seat_data = searchData(film_id, "temp_seat")
+
+    available_ticket: int
+    available_seat: list
+
+    if temp_seat_data:
+        # available seat loaded from database
+        available_seat = temp_seat_data[film_id]["available_seat"]
+        available_ticket = len(available_seat)
+
+    else:
+        # create new available seat list and write to database
+        available_ticket = int(film_dict[film_id]["kuota_penonton"])
+
+        available_seat = [
+            "K" + str(i)
+            for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
+        ]
+
+        # preparing data and write to database
+        temp_seat = getAllData("temp_seat")
+
+        temp_seat[film_id] = {
+            "judul_film": film_dict[film_id]["judul_film"],
+            "available_seat": available_seat,
+        }
+
+        updateData(data_dict=temp_seat, data_name="temp_seat")
 
     judul_film = film_dict[film_id]["judul_film"]
 
     # Load queue from file if exists
     q = _load_queue(film_id, judul_film)
 
-    # Load booking/ticket data from temp_log_pemesanan.txt
-    restored_log = getAllData("temp_log_pemesanan")
+    # Load booking/ticket data
     ll = Ticket()
     _load_tickets(film_id, judul_film, ll)
 
-    # Menampilkan menu sistem antrean secara berulang sampai user memilih untuk kembali ke menu utama
+    # Menu utama
     while True:
         console = Console()
+
         tiket = available_ticket
+
         content = f"""
         [bold white]Judul Film     :[/bold white] {judul_film}
         [bold white]Tiket Tersedia :[/bold white] {tiket}
         """
 
         _clear()
+
         print("\n\n\n")
+
         console.print(
             Panel(
                 content,
@@ -284,6 +362,7 @@ def sistemAntrean(film_id: str):
         )
 
         print("\n[bold white]Pilih opsi[/bold white]")
+
         choice = inquirer.select(
             message="",
             choices=[
@@ -329,28 +408,35 @@ def sistemAntrean(film_id: str):
                         continue
 
                     q.enqueue(nama_penonton)
+
                     _save_queue(film_id, q)
 
                     _processing("Memproses...")
                     _clear()
+
                     print(f"[green]{nama_penonton} masuk antrean.[/green]")
+
                 else:
                     print("[bold red]Antrean Penuh, tiket habis![/bold red]")
 
             case "2. Layani Antrean":
                 if q.isEmpty():
                     _clear()
+
                     print(
                         "[bold red]Antrean kosong, tidak ada yang bisa dilayani![/bold red]"
                     )
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
                 if available_ticket < 1:
                     _clear()
+
                     print(
                         "[bold red]Tiket habis, tidak ada yang bisa dilayani![/bold red]"
                     )
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
@@ -375,9 +461,21 @@ def sistemAntrean(film_id: str):
                     except ValueError:
                         print("[bold red]Masukkan bilangan yang valid![/bold red]")
 
-                ticket_amount, selected_seat = orderKursi(user_ticket, available_seat)
+                ticket_amount, selected_seat, available_seat = orderKursi(
+                    user_ticket, available_seat
+                )
 
                 available_ticket -= ticket_amount
+
+                # remove selected_seat from database and write to database
+                temp_seat = getAllData("temp_seat")
+
+                temp_seat[film_id] = {
+                    "judul_film": film_dict[film_id]["judul_film"],
+                    "available_seat": available_seat,
+                }
+
+                updateData(data_dict=temp_seat, data_name="temp_seat")
 
                 q.updateQueue(
                     jumlah_tiket=ticket_amount,
@@ -396,23 +494,30 @@ def sistemAntrean(film_id: str):
                     judul_film=judul_film,
                 )
 
+                # save permanent log
                 log_pemesanan = getAllData("log_pemesanan")
-                log_pemesanan[log_pemesanan_ID] = {
+
+                log_id = generateID()
+
+                log_pemesanan[log_id] = {
                     "nama": nama_customer,
                     "jumlah_tiket": ticket_amount,
                     "urutan_antrean": urutan_antrean,
                     "judul": judul_film,
                     "date": q.front.create_at,
                 }
+
                 updateData(data_dict=log_pemesanan, data_name="log_pemesanan")
 
                 _processing("Memproses...")
                 _clear()
+
                 invoice(judul=judul_film, nama=nama_customer, kursi=selected_seat)
 
                 served_node = q.dequeue()
+
                 _save_queue(film_id, q)
-                _save_tickets(film_id, judul_film, ll, restored_log)
+                _save_tickets(judul_film, ll)
 
                 print(
                     f"[cyan]Invoice berhasil dicetak | {served_node.nama} telah dilayani![/cyan]\n"
@@ -420,20 +525,26 @@ def sistemAntrean(film_id: str):
 
             case "3. Lihat Antrean":
                 _clear()
+
                 q.showQueue()
+
                 input("[Tekan Enter untuk Kembali]")
 
             case "4. Lihat Data Pemesanan":
                 _clear()
+
                 ll.showTickets()
+
                 input("[Tekan Enter untuk Kembali]")
 
             case "5. Batalkan Antrean":
                 _clear()
+
                 if q.isEmpty():
                     print(
                         "[bold red]Antrean kosong, tidak ada data yang bisa dibatalkan![/bold red]"
                     )
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
@@ -458,24 +569,29 @@ def sistemAntrean(film_id: str):
 
                 if not canceled_user:
                     print("[bold red]Nama tidak ditemukan.[/bold red]")
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
                 _processing("Membatalkan antrean...")
+
                 _save_queue(film_id, q)
-                _save_tickets(film_id, judul_film, ll, restored_log)
+                _save_tickets(judul_film, ll)
 
                 _clear()
+
                 print(
                     f"[green]Antrean atas nama {canceled_user}{f' dengan urutan {canceled_urutan}' if canceled_urutan else ''} berhasil dibatalkan.[/green]"
                 )
 
             case "6. Hapus Data Pemesanan":
                 _clear()
+
                 if ll.isEmpty():
                     print(
                         "[bold red]Data pemesanan kosong, tidak ada data yang bisa dibatalkan![/bold red]"
                     )
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
@@ -497,21 +613,29 @@ def sistemAntrean(film_id: str):
                     continue
 
                 _processing("Membatalkan pemesanan...")
+
                 refunded_ticket, refunded_seat = ll.deleteTicket(nama)
+
                 available_ticket += refunded_ticket
+
                 available_seat.extend(refunded_seat)
+
                 available_seat = seat_sort(available_seat)
-                _save_tickets(film_id, judul_film, ll, restored_log)
+
+                _save_tickets(judul_film, ll)
 
                 _clear()
+
                 print("[green]Pemesanan berhasil dibatalkan![/green]")
 
             case "7. Cari Data Pemesanan":
                 _clear()
+
                 if ll.isEmpty():
                     print(
                         "[bold red]Data pemesanan kosong, tidak ada data yang bisa dicari![/bold red]"
                     )
+
                     input("\nTekan Enter untuk kembali...")
                     continue
 
@@ -522,6 +646,7 @@ def sistemAntrean(film_id: str):
 
                     if nama.isalpha() or not nama:
                         break
+
                     print(
                         "[bold red]Nama customer harus berupa huruf dan tidak boleh berupa simbol.[/bold red]"
                     )
@@ -532,6 +657,7 @@ def sistemAntrean(film_id: str):
                     continue
 
                 _clear()
+
                 if not ll.searchTicket(nama):
                     print("[bold red]Nama tidak ditemukan.[/bold red]")
 
@@ -539,17 +665,16 @@ def sistemAntrean(film_id: str):
 
             case "8. Reset Antrean dan Pemesanan":
                 _processing("Mereset...")
+
                 resetOrder(queue=q, ticket=ll)
 
-                # Update available ticket and seat from film quota
+                # delete seat data at temp_seat and reset seat availability
+                deleteTempSeat(judul_film)
                 available_ticket = int(film_dict[film_id]["kuota_penonton"])
-                available_seat = [
-                    "K" + str(i)
-                    for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
-                ]
 
                 # Clear queue file for this film
                 data = getAllData("data_antrean")
+
                 if film_id in data:
                     del data[film_id]
                     updateData(data, "data_antrean")
@@ -558,11 +683,14 @@ def sistemAntrean(film_id: str):
                 deleteTempPemesanan(judul_film)
 
                 _clear()
+
                 print("[green]Antrean dan pemesanan berhasil di-reset.[/green]\n")
 
             case "0. Kembali":
                 _clear()
+
                 print("Kembali ke menu utama.")
+
                 break
 
             case _:
