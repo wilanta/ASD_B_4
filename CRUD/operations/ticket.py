@@ -1,52 +1,36 @@
 """
 ==========================================================
 Manajemen Data Pemesanan (Linked List)
-Berisi algoritma Linked List untuk mengelola dan menyimpan data pemesanan tiket.
+Berisi algoritma linked list untuk menyimpan dan mengelola
+data pemesanan tiket bioskop secara terstruktur.
 
 Kontributor : Fateeh Falah Hendarto
-Fungsi/fitur:
-1. addTicket
-2. showTickets
-3. deleteTicket
-4. searchTicket
+
+Class:
+1. Ticket
+
+Method:
+1. addTicket     - Menambahkan record pemesanan ke linked list
+2. showTickets   - Menampilkan seluruh daftar pemesanan
+3. deleteTicket  - Menghapus satu record pemesanan berdasarkan nama
+4. searchTicket  - Mencari record pemesanan berdasarkan nama
 ==========================================================
 """
 
 from CRUD.utils.node import Node
 from CRUD.utils.seatSort import seat_sort
-from CRUD.utils.dataOps import getAllData
 
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-import os
-import sys
-import time
-
-
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
-
-
-def _processing(msg="Memproses"):
-    _clear()
-    symbols = ["|", "/", "-", "\\"]
-    start = time.time()
-    i = 0
-    while time.time() - start < 3:
-        print(f"\r{msg} {symbols[i % len(symbols)]}", end="", flush=True)
-        time.sleep(0.15)
-        i += 1
-    _clear()
 
 
 # ````````````````````````````````````````````
 # Nama kelas: Ticket
-# Penjelasan kelas : Untuk membuat linked list yang akan digunakan untuk
-# menyimpan data dan log pemesanan tiket.
+# Penjelasan kelas : Linked list untuk menyimpan data dan log pemesanan tiket.
 # ````````````````````````````````````````````
 class Ticket:
-    "LinkedList untuk data pemesanan."
+    """Linked list untuk data pemesanan tiket bioskop."""
 
     def __init__(self):
         self.head = None
@@ -54,18 +38,19 @@ class Ticket:
 
     # ------------------------------
     # Nama fungsi: addTicket
-    # Penjelasan fungsi : Untuk menambahkan ticket ke linked list.
+    # Penjelasan fungsi : Menambahkan record pemesanan baru
+    # ke akhir linked list.
     # ------------------------------
     def addTicket(self, nama, jumlah_tiket, nomor_kursi, urutan_antrean, judul_film):
         """
-        Menambah tiket ke data.
+        Menambahkan record pemesanan ke linked list.
 
         Args:
-            nama (str) : Nama customer
-            jumlah_tiket (int) : Jumlah tiket yang dipesan
-            nomor_kursi (list) : List kursi yang dipilih
-            urutan_antrean (int) : Urutan dalam antrean
-            nama (str) : Nama customer
+            nama (str): Nama customer.
+            jumlah_tiket (int): Jumlah tiket yang dipesan.
+            nomor_kursi (list): List nomor kursi yang dipilih.
+            urutan_antrean (int): Urutan dalam antrean.
+            judul_film (str): Judul film yang ditonton.
         """
 
         # Membuat node baru
@@ -82,19 +67,19 @@ class Ticket:
 
     # ------------------------------
     # Nama fungsi: isEmpty
-    # Penjelasan fungsi : Untuk mengecek apakah linked list kosong atau tidak.
+    # Penjelasan fungsi : Mengecek apakah linked list pemesanan kosong atau tidak.
     # ------------------------------
     def isEmpty(self):
-        "Cek apabila Linked List kosong."
+        "Mengecek apakah linked list kosong."
         return self.head is None
 
     # ------------------------------
     # Nama fungsi: showTickets
-    # Penjelasan fungsi : Untuk menampilkan semua ticket yang berada dalam linked list.
+    # Penjelasan fungsi : Menampilkan seluruh record pemesanan
+    # dalam bentuk tabel menggunakan rich.
     # ------------------------------
-
     def showTickets(self):
-        "Menunjukkan daftar pemesanan tiket."
+        "Menampilkan seluruh daftar pemesanan tiket."
 
         console = Console()
 
@@ -130,19 +115,18 @@ class Ticket:
 
     # ------------------------------
     # Nama fungsi: deleteTicket
-    # Penjelasan fungsi : Untuk menghapus satu ticket dalam linked list.
+    # Penjelasan fungsi : Menghapus satu record pemesanan dari linked list
+    # berdasarkan nama customer.
     # ------------------------------
-
     def deleteTicket(self, nama):
         """
-        Menghapus tiket dari data.
+        Menghapus record pemesanan berdasarkan nama.
 
         Args:
-            nama (str): Nama customer
+            nama (str): Nama customer yang akan dihapus.
 
-        Return:
-            jumlah_tiket (int): Jumlah tiket yang dibatalkan
-            nomor_kursi (list): Nomor kursi yang dibatalkan
+        Returns:
+            tuple: (jumlah_tiket, nomor_kursi) yang dikembalikan, atau (None, None) jika tidak ditemukan.
         """
         current = self.head  # Variabel sementara dari awal node
 
@@ -167,17 +151,18 @@ class Ticket:
 
     # ------------------------------
     # Nama fungsi: searchTicket
-    # Penjelasan fungsi : Untuk satu mencari ticket dalam linked list.
+    # Penjelasan fungsi : Mencari satu record pemesanan dalam linked list.
+    # Jika ditemukan, menampilkan detail pemesanan dalam bentuk tabel.
     # ------------------------------
     def searchTicket(self, nama):
         """
-        Mencari data pemesanan.
+        Mencari record pemesanan berdasarkan nama.
 
         Args:
-            nama (str): Nama customer
+            nama (str): Nama customer yang dicari.
 
         Returns:
-            found (bool): Tampilkan list atau tidak
+            bool: True jika ditemukan, False jika tidak.
         """
 
         current = self.head

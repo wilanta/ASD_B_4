@@ -1,15 +1,14 @@
 """
 ==========================================================
 Main Menu
-Berisi menu sistem kontrol dan navigasi untuk ke fitur
+Titik masuk utama aplikasi BIOSKOP CACB.
+Berisi navigasi menu dan kontrol ke seluruh fitur sistem.
 
 Kontributor : Wildhan Dzikrihantara, M. Lutfi Ramadhan Warendra
-Fungsi/fitur:
-1. main
-2. sistemAntrean
-3. pilihFilm
-==========================================================
 
+Fungsi/fitur:
+1. main - Menampilkan menu utama dan mengarahkan ke fitur yang dipilih
+==========================================================
 """
 
 # Import features yang akan digunakan di main
@@ -28,20 +27,15 @@ from CRUD.operations.report import generateReport
 # Untuk interface
 from InquirerPy import inquirer
 from rich import print
-from rich.console import Console
-from rich.status import Status
+from CRUD.utils.clear import _clear
+from CRUD.utils.loading import _processing
 import shutil
-import time
-import sys
-import os
 
 
 # ------------------------------
 # Nama fungsi: main
 # Penjelasan fungsi : Untuk tampilan dan kontrol main menu.
 # ------------------------------
-
-
 def main():
     while True:
         _clear()
@@ -208,34 +202,6 @@ def main():
 
             case _:  # Pilihan tidak valid
                 print("Pilihan tidak valid!\n")
-
-
-# Clear screen helper
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
-
-
-# Spinner + ~3s delay helper (using rich console spinner for consistency)
-def _processing(msg="Memproses"):
-    _clear()
-    console = Console()
-    messages = [
-        "Mohon tunggu sebentar...",
-        "Sedang memproses data...",
-        "Hampir selesai...",
-        "Menyimpan perubahan...",
-    ]
-    with console.status(
-        "[bold cyan]{}[/bold cyan]".format(msg), spinner="dots"
-    ) as status:
-        for i in range(15):
-            time.sleep(0.2)
-            status.update(
-                "[bold cyan]{}[/bold cyan]  [dim]{}[/dim]".format(
-                    msg, messages[i % len(messages)]
-                )
-            )
-    _clear()
 
 
 if __name__ == "__main__":

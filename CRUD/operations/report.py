@@ -1,3 +1,15 @@
+"""
+==========================================================
+Laporan Penjualan
+Menghasilkan laporan penjualan tiket bioskop dalam format PDF
+berisi ringkasan statistik dan tabel seluruh transaksi.
+
+Fungsi/fitur:
+1. analyze         - Menganalisis data transaksi dan mengembalikan statistik
+2. generateReport - Membuat file PDF laporan penjualan
+==========================================================
+"""
+
 from collections import Counter
 from datetime import datetime
 import os
@@ -15,6 +27,11 @@ from reportlab.platypus import (
 )
 
 
+# ------------------------------
+# Nama fungsi: analyze
+# Penjelasan fungsi : Menganalisis data transaksi dan menghasilkan
+# statistik penjualan tiket (total transaksi, tiket terjual, film terlaris, dll).
+# ------------------------------
 def analyze(transaction_data):
     """
     Menganalisis data transaksi penjualan tiket.
@@ -54,6 +71,11 @@ def analyze(transaction_data):
     }
 
 
+# ------------------------------
+# Nama fungsi: generateReport
+# Penjelasan fungsi : Membuat dan menyimpan laporan penjualan tiket
+# dalam format PDF berisi ringkasan statistik dan tabel transaksi lengkap.
+# ------------------------------
 def generateReport(transaction_data):
     """
     Membuat laporan PDF penjualan tiket bioskop.

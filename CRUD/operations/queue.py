@@ -1,22 +1,24 @@
 """
 ==========================================================
 Manajemen Antrean (Queue)
-Berisi algoritma queue untuk mengelola antrean tiket bioskop yang terdiri atas beberapa fungsi.
+Berisi struktur data queue (antrean FIFO) untuk mengelola
+urutan pelayanan tiket bioskop.
 
 Kontributor : Wildhan Dzikrihantara
+
 Class:
 1. Queue
 
 Method:
-1. enqueue
-2. dequeue
-3. isEmpty
-4. cancelQueue
-5. showQueue
-6. updateQueue
-7. peek
-8. countNameInQueue (internal use only [helper method untuk cancelQueue])
-9. adjustAntrean (internal use only [helper method untuk cancelQueue])
+1. enqueue       - Menambahkan customer ke belakang antrean
+2. dequeue       - Menghapus customer dari depan antrean
+3. isEmpty       - Mengecek apakah antrean kosong
+4. cancelQueue   - Membatalkan satu antrean berdasarkan nama
+5. showQueue     - Menampilkan seluruh daftar antrean
+6. updateQueue   - Memperbarui data customer di depan antrean
+7. peek          - Melihat customer terdepan tanpa menghapus
+8. countNameInQueue    - Menghitung kemunculan nama dalam antrean
+9. adjustAntrean       - Menyesuaikan nomor urut setelah pembatalan
 ==========================================================
 """
 
@@ -27,23 +29,59 @@ from rich.panel import Panel
 from CRUD.utils.node import Node
 
 
+# ------------------------------
+# Nama kelas: Queue
+# Penjelasan kelas : Struktur data antrean (FIFO) untuk mengelola
+# urutan pelayanan customer di bioskop.
+# ------------------------------
 class Queue:
+    # ------------------------------
+    # Nama fungsi: __init__
+    # Penjelasan fungsi : Inisialisasi struktur antrean kosong.
+    # ------------------------------
     def __init__(self):
         self.front = None
         self.rear = None
         self.urutan = 1
 
+    # ------------------------------
+    # Nama fungsi: __init__
+    # Penjelasan fungsi : Inisialisasi struktur antrean kosong.
+    # ------------------------------
+    def __init__(self):
+        self.front = None
+        self.rear = None
+        self.urutan = 1
+
+    # ------------------------------
+    # Nama fungsi: isEmpty
+    # Penjelasan fungsi : Mengecek apakah antrean dalam kondisi kosong.
+    # ------------------------------
     def isEmpty(self):
-        "Ketika queue kosong maka front -> rear -> none"
+        "Mengecek apakah antrean kosong."
         return self.front is None
 
+    # ------------------------------
+    # Nama fungsi: peek
+    # Penjelasan fungsi : Melihat data customer di depan antrean
+    # tanpa menghapusnya dari antrean.
+    # ------------------------------
+    def peek(self) -> Node | None:
+        "Mengembalikan node terdepan tanpa menghapusnya."
+        return self.front
+
+    # ------------------------------
+    # Nama fungsi: enqueue
+    # Penjelasan fungsi : Menambahkan customer baru ke belakang antrean (rear).
+    # Setiap customer baru mendapatkan nomor urutan yang bertambah.
+    # ------------------------------
     def enqueue(self, nama: str):
         """
-        Menambahkan data baru ke bagian belakang antrean (rear)\n
-        Setiap data baru yang masuk ke antrean akan mendapatkan nomor urut yang bertambah
+        Menambahkan customer baru ke belakang antrean (rear).
+        Setiap customer baru mendapatkan nomor urut yang bertambah.
 
         Args:
-            nama (str): Nama client yang akan ditambahkan ke antrean
+            nama (str): Nama customer yang ditambahkan ke antrean.
         """
         new_node = Node(nama, urutan_antrean=self.urutan)
         self.urutan += 1
@@ -56,15 +94,19 @@ class Queue:
         self.rear.next = new_node
         self.rear = new_node
 
+    # ------------------------------
+    # Nama fungsi: updateQueue
+    # Penjelasan fungsi : Memperbarui data customer di depan antrean
+    # pada fase layani antrean (hanya node front).
+    # ------------------------------
     def updateQueue(self, jumlah_tiket: int, nomor_kursi: list, judul_film: str):
         """
-        Mengupdate data pada node yang ada dalam antrean pada fase layani antrean\n
-        Hanya untuk node bagian front (data yang sedang dilayani)
+        Memperbarui data customer di depan antrean.
 
         Args:
-            jumlah_tiket (int): Jumlah tiket yang dipesan oleh client
-            nomor_kursi (list): Nomor kursi yang dipesan oleh client
-            judul_film (str): Judul film yang ditonton oleh client
+            jumlah_tiket (int): Jumlah tiket yang dipesan.
+            nomor_kursi (list): Nomor kursi yang dipesan.
+            judul_film (str): Judul film yang ditonton.
         """
         if self.isEmpty():
             print("Antrean kosong!")
@@ -74,14 +116,17 @@ class Queue:
         self.front.nomor_kursi = nomor_kursi
         self.front.judul_film = judul_film
 
+    # ------------------------------
+    # Nama fungsi: dequeue
+    # Penjelasan fungsi : Menghapus dan mengembalikan customer di depan antrean.
+    # Customer yang dihapus adalah yang sedang dilayani.
+    # ------------------------------
     def dequeue(self) -> Node | None:
         """
-        Menghapus data paling depan dari antrean (front)\n
-        Data yang dihapus merupakan data yang sedang dilayani, sehingga\n
-        data tersebut akan diproses terlebih dahulu sebelum dihapus
+        Menghapus dan mengembalikan customer di depan antrean.
 
         Returns:
-            Node: Node yang dihapus dari antrean (data yang sedang dilayani)
+            Node | None: Node customer yang dilayani, atau None jika antrean kosong.
         """
 
         if self.isEmpty():
@@ -96,14 +141,11 @@ class Queue:
 
         return node_dilayani
 
-    def peek(self) -> Node | None:
-        """Returns the front node without removing it."""
-        return self.front
-
+    # ------------------------------
+    # Nama fungsi: showQueue
+    # Penjelasan fungsi : Menampilkan seluruh daftar antrean dalam bentuk tabel.
+    # ------------------------------
     def showQueue(self):
-        """
-        Menampilkan data dalam antrean
-        """
         console = Console()
 
         if self.isEmpty():
@@ -137,15 +179,20 @@ class Queue:
 
         console.print(table)
 
+    # ------------------------------
+    # Nama fungsi: countNameInQueue
+    # Penjelasan fungsi : Menghitung jumlah kemunculan nama tertentu dalam antrean.
+    # Helper internal untuk cancelQueue.
+    # ------------------------------
     def countNameInQueue(self, nama: str) -> int:
         """
-        Menghitung jumlah kemunculan nama tertentu dalam antrean
+        Menghitung kemunculan nama dalam antrean.
 
         Args:
-            nama (str): Nama client yang akan dihitung jumlah kemunculannya dalam antrean
+            nama (str): Nama yang ingin dihitung.
 
         Returns:
-            int: Jumlah kemunculan nama dalam antrean
+            int: Jumlah kemunculan nama.
         """
         count = 0
         current = self.front
@@ -157,12 +204,18 @@ class Queue:
 
         return count
 
+    # ------------------------------
+    # Nama fungsi: adjustAntrean
+    # Penjelasan fungsi : Menyesuaikan nomor urut antrean بعد pembatalan.
+    # Mengurangi urutan semua node setelah node yang dibatalkan.
+    # Helper internal untuk cancelQueue.
+    # ------------------------------
     def adjustAntrean(self, start_node):
         """
-        Menyesuaikan nomor urut antrean setelah pembatalan antrean\n
+        Menyesuaikan nomor urut antrean setelah pembatalan.
 
         Args:
-            start_node (Node): Node yang menjadi titik awal penyesuaian nomor urut antrean (node setelah node yang dibatalkan)
+            start_node: Node yang menjadi titik awal penyesuaian.
         """
 
         current = start_node
@@ -171,15 +224,21 @@ class Queue:
             current.urutan_antrean -= 1
             current = current.next
 
+    # ------------------------------
+    # Nama fungsi: cancelQueue
+    # Penjelasan fungsi : Membatalkan satu customer dari antrean berdasarkan nama.
+    # Jika ada lebih dari satu customer dengan nama yang sama,
+    # akan diminta memilih urutan yang akan dibatalkan.
+    # ------------------------------
     def cancelQueue(self, nama: str):
         """
-        Membatalkan satu node dalam antrean (queue)\n
+        Membatalkan satu customer dari antrean.
 
         Args:
-            nama (str): Nama client yang akan dibatalkan dari antrean
+            nama (str): Nama customer yang akan dibatalkan.
+
         Returns:
-            nama (str): Nama client yang dibatalkan dari antrean
-            urutan_batal (int): Urutan saat client dibatalkan
+            tuple: (nama, urutan_batal) atau (None, urutan_batal) jika tidak ditemukan.
         """
 
         count_nama = self.countNameInQueue(nama)

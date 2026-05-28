@@ -1,14 +1,16 @@
 """
 ==========================================================
 Manajemen Daftar Film
-Mengelola film seperti menambahkan judul, mengubah judul/kuota penonton, dan menghapus judul film
+CRUD (Create, Read, Update, Delete) untuk mengelola
+daftar film bioskop: menambah, mengubah, dan menghapus film.
 
 Kontributor : M. Lutfi Ramadhan Warendra
+
 Fungsi/fitur:
-1. showFilm
-2. updateFilm
-3. deleteFilm
-4. addFilm
+1. pilihFilm   - Menampilkan daftar film dan memilih salah satu
+2. addFilm     - Menambahkan film baru ke database
+3. updateFilm  - Mengubah judul dan/atau kuota penonton film
+4. deleteFilm  - Menghapus film dari database
 ==========================================================
 """
 
@@ -19,37 +21,9 @@ from InquirerPy.base.control import Choice
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-import os
-import sys
-import time
 
-
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
-
-
-def _processing(msg="Memproses", detail="Mohon tunggu sebentar..."):
-    _clear()
-    console = Console()
-    messages = [
-        detail,
-        "Mohon tunggu sebentar...",
-        "Sedang memproses data...",
-        "Hampir selesai...",
-        "Menyimpan perubahan...",
-    ]
-    with console.status(
-        "[bold cyan]{}[/bold cyan]".format(msg), spinner="dots"
-    ) as status:
-        for i in range(15):
-            time.sleep(0.2)
-            status.update(
-                "[bold cyan]{}[/bold cyan]  [dim]{}[/dim]".format(
-                    msg, messages[i % len(messages)]
-                )
-            )
-    _clear()
-
+# Utils
+from CRUD.utils.clear import _clear
 
 # Utilities
 from CRUD.utils.idGenerator import generateID
@@ -57,7 +31,8 @@ from CRUD.utils.dataOps import getAllData, updateData
 
 # ------------------------------
 # Nama fungsi: pilihFilm
-# Penjelasan fungsi : Untuk memilih film yang akan dimanage sistem anterannya.
+# Penjelasan fungsi : Menampilkan daftar film yang tersedia
+# dan mengembalikan ID film yang dipilih oleh user.
 # ------------------------------
 
 
@@ -117,17 +92,17 @@ def pilihFilm() -> str | None:
 
 # ------------------------------
 # Nama fungsi: updateFilm
-# Penjelasan fungsi : Untuk untuk menganti judul film dan kuota
-#                     penonton film serta menyimpannya ke file .txt.
+# Penjelasan fungsi : Mengubah judul film dan/atau kuota penonton,
+# lalu menyimpan perubahan ke file data_film.txt.
 # ------------------------------
 def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
     """
-    Meng-update judul film dan kuota penonton.
+    Mengubah judul film dan/atau kuota penonton.
 
     Args:
-        judul_film (str): Judul Film
-        kuota_penonton (str): Kuota Penonton
-        film_id (str): ID Film
+        judul_film (str): Judul film baru (kosongkan untuk tidak mengubah).
+        kuota_penonton (int): Kuota penonton baru (kosongkan untuk tidak mengubah).
+        film_id (str): ID film yang akan diubah.
     """
 
     # Mengambil data dari database agar data lainnya tidak terhapus
@@ -151,14 +126,14 @@ def updateFilm(judul_film: str, kuota_penonton: int, film_id: str):
 
 # ------------------------------
 # Nama fungsi: deleteFilm
-# Penjelasan fungsi : Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
+# Penjelasan fungsi : Menghapus satu film dari database berdasarkan ID.
 # ------------------------------
 def deleteFilm(film_id):
     """
-    Untuk menghapus film dari daftar film serta menyimpannya ke file .txt.
+    Menghapus film dari database berdasarkan ID.
 
     Args:
-        film_id (str): ID film
+        film_id (str): ID film yang akan dihapus.
     """
 
     # Ambil data dari database
@@ -178,15 +153,16 @@ def deleteFilm(film_id):
 
 # ------------------------------
 # Nama fungsi: addFilm
-# Penjelasan fungsi : Untuk menambahkan film ke daftar film serta menyimpannya ke file data_film.txt.
+# Penjelasan fungsi : Menambahkan film baru ke database dan menyimpannya
+# ke file data_film.txt.
 # ------------------------------
 def addFilm(judul: str, kuota_penonton: int):
     """
-    Menambahkan film ke daftar file txt data_film
+    Menambahkan film baru ke database.
 
     Args:
-        judul (str): Judul film
-        kuota_penonton (int): Kuota / kapasitas penonton
+        judul (str): Judul film.
+        kuota_penonton (int): Kuota/kapasitas penonton.
     """
 
     # Mengambil data dari database agar data baru tidak menimpa data lama

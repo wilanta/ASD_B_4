@@ -31,54 +31,42 @@ from CRUD.utils.idGenerator import generateID
 from CRUD.utils.dataOps import getAllData, searchData, updateData
 from CRUD.utils.seatSort import seat_sort
 from CRUD.utils.node import Node
+from CRUD.utils.clear import _clear
+from CRUD.utils.loading import _processing
 
 # Untuk interface
 from rich.console import Console
 from rich.panel import Panel
 from InquirerPy import inquirer
 from rich import print
-import os
-import sys
-import time
 
 
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
-
-
-def _processing(msg="Memproses", detail="Mohon tunggu sebentar..."):
-    _clear()
-    console = Console()
-    messages = [
-        detail,
-        "Mohon tunggu sebentar...",
-        "Sedang memproses data...",
-        "Hampir selesai...",
-        "Menyimpan perubahan...",
-    ]
-    with console.status(
-        "[bold cyan]{}[/bold cyan]".format(msg), spinner="dots"
-    ) as status:
-        for i in range(15):
-            time.sleep(0.2)
-            status.update(
-                "[bold cyan]{}[/bold cyan]  [dim]{}[/dim]".format(
-                    msg, messages[i % len(messages)]
-                )
-            )
-    _clear()
-
-
+# ------------------------------
+# Nama fungsi: _load_queue
+# Penjelasan fungsi : Memuat state antrean dari file data_antrean.txt
+# berdasarkan film_id yang diberikan.
+# ------------------------------
 def _load_queue(film_id: str, judul_film: str) -> Queue:
-    """Load queue state from file for the given film_id."""
+    """
+    Memuat state antrean dari file untuk film tertentu.
+
+    Args:
+        film_id (str): ID film.
+        judul_film (str): Judul film.
+
+    Returns:
+        Queue: Objek queue yang sudah dimuat dengan data dari file.
+    """
+    # Inisialisasi queue kosong
     q = Queue()
     data = getAllData("data_antrean")
 
+    # Memuat nodes dari file jika sudah ada state tersimpan
     if film_id in data:
         q.urutan = data[film_id].get("urutan_counter", 1)
         nodes = data[film_id].get("nodes", [])
 
-        # Rebuild linked-list in order
+        # Merekonstruksi linked list secara berurutan
         prev = None
         for node_dict in nodes:
             node = Node(
@@ -100,8 +88,20 @@ def _load_queue(film_id: str, judul_film: str) -> Queue:
     return q
 
 
+# ------------------------------
+# Nama fungsi: _save_queue
+# Penjelasan fungsi : Menyimpan state antrean saat ini ke file
+# data_antrean.txt sesuai format dataOps.py.
+# ------------------------------
 def _save_queue(film_id: str, q: Queue):
-    """Save current queue state to file, matching dataOps.py data_antrean format."""
+    """
+    Menyimpan state antrean saat ini ke file data_antrean.txt.
+
+    Args:
+        film_id (str): ID film.
+        q (Queue): Objek queue yang state-nya akan disimpan.
+    """
+    # Mengumpulkan semua node menjadi list dictionary
     nodes_list = []
     current = q.front
     while current is not None:
@@ -118,6 +118,7 @@ def _save_queue(film_id: str, q: Queue):
         )
         current = current.next
 
+    # Membaca data lama, menambahkan/memperbarui entry film ini, lalu menyimpan
     data = getAllData("data_antrean")
     data[film_id] = {"urutan_counter": q.urutan, "nodes": nodes_list}
     updateData(data, "data_antrean")
@@ -127,8 +128,19 @@ def _save_queue(film_id: str, q: Queue):
 # Nama fungsi: _load_tickets
 # Penjelasan fungsi : Untuk memuat data pemesanan dari log_pemesanan.txt ke linked list Ticket.
 # ------------------------------
+# Nama fungsi: _load_tickets
+# Penjelasan fungsi : Memuat data pemesanan dari temp_log_pemesanan.txt
+# ke linked list Ticket untuk film tertentu.
+# ------------------------------
 def _load_tickets(film_id: str, judul_film: str, ll: Ticket):
-    """Load booking records for this film from log_pemesanan.txt into the Ticket linked list."""
+    """
+    Memuat record pemesanan dari file ke linked list Ticket.
+
+    Args:
+        film_id (str): ID film (tidak digunakan langsung, digunakan judul_film untuk filter).
+        judul_film (str): Judul film sebagai kunci penyaringan record.
+        ll (Ticket): Objek Ticket linked list sebagai target muat data.
+    """
     log = getAllData("temp_log_pemesanan")
     for record in log.values():
         if record.get("judul") == judul_film:
@@ -150,13 +162,23 @@ def _load_tickets(film_id: str, judul_film: str, ll: Ticket):
 
 # ------------------------------
 # Nama fungsi: _save_tickets
-# Penjelasan fungsi : Untuk menyimpan data Ticket ke temp_log_pemesanan.txt (hanya records film ini).
+# Penjelasan fungsi : Menyimpan state Ticket linked list saat ini
+# ke temp_log_pemesanan.txt (hanya records film ini).
 # ------------------------------
 log_pemesanan_ID = generateID()
 
 
 def _save_tickets(film_id: str, judul_film: str, ll: Ticket, restored_log: dict):
-    """Save current Ticket linked list to temp_log_pemesanan.txt for this film only."""
+    """
+    Menyimpan state Ticket linked list ke file temp_log_pemesanan.txt.
+
+    Args:
+        film_id (str): ID film.
+        judul_film (str): Judul film sebagai filter record.
+        ll (Ticket): Objek linked list Ticket yang akan disimpan.
+        restored_log (dict): Log yang dibaca sebelumnya untuk disatukan.
+    """
+    # Mengumpulkan records dari linked list
     current = ll.head
     film_records = {}
     while current is not None:
@@ -191,13 +213,23 @@ def _save_tickets(film_id: str, judul_film: str, ll: Ticket, restored_log: dict)
     updateData(result, "temp_log_pemesanan")
 
 
-def deleteTempPemesanan(
-    judul_film: str,
-):
-    # Ambil dari database
+# ------------------------------
+# Nama fungsi: deleteTempPemesanan
+# Penjelasan fungsi : Menghapus semua record pemesanan sementara
+# dari temp_log_pemesanan.txt berdasarkan judul film.
+# ------------------------------
+def deleteTempPemesanan(judul_film: str):
+    """
+    Menghapus record pemesanan sementara berdasarkan judul film.
+
+    Args:
+        judul_film (str): Judul film yang record-nya akan dihapus.
+    """
+    # Mengambil semua data dari database
     temp_pemesanan_data = getAllData("temp_log_pemesanan")
 
-    # Hapus berdasarkan judul yang ditemukan
+    # Menyaring data agar hanya menyisakan record yang BUKAN film ini
+    # Record dengan judul yang cocok akan dihapus
     temp_pemesanan_data = {
         log_id: data
         for log_id, data in temp_pemesanan_data.items()

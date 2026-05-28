@@ -1,12 +1,13 @@
 """
 ==========================================================
 Data Operations
-Berisi operations untuk mengelola data .txt
+Mengelola operasi baca dan tulis data ke file .txt
+sebagai database sederhana aplikasi bioskop.
 
 Fungsi/fitur:
-1. getAllData
-2. searchData
-3. updateData
+1. getAllData   - Membaca semua data dari file .txt
+2. searchData   - Mencari satu baris data berdasarkan ID
+3. updateData   - Menyimpan data dictionary ke file .txt
 ==========================================================
 """
 

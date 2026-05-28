@@ -1,7 +1,8 @@
 """
 ==========================================================
 Node
-Membuat node untuk digunakan pada linked list dan queue
+Membuat objek node untuk digunakan pada struktur data
+linked list dan queue dalam sistem antrean tiket bioskop.
 
 Class:
 1. Node

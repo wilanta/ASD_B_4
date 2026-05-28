@@ -1,41 +1,32 @@
 """
 ==========================================================
-Manajemen Pemesanan Kursi & Manajemen Pemesanan Tiket
-Untuk memilih kursi yang kosong untuk customer secara bebas
-dan menyimpan pemesanan ke log_antrean.txt.
+Manajemen Pemesanan Kursi
+Memilih kursi yang tersedia untuk customer secara interaktif
+dan menyimpan data pemesanan ke log.
 
 Kontributor : Fateeh Falah Hendarto
+
 Fungsi/fitur:
-1. orderKursi
-2. resetOrder
+1. orderKursi    - Alur pemilihan kursi secara interaktif
+2. display_seats - Menampilkan denah kursi bioskop di terminal
+3. resetOrder    - Mengosongkan queue dan linked list
 ==========================================================
 """
 
 from rich.console import Console
 from rich.panel import Panel
-import os
-import sys
-import time
+
+# Utils
+from CRUD.utils.clear import _clear
 
 console = Console()
 
 
-def _clear():
-    os.system("cls" if sys.platform == "win32" else "clear")
-
-
-def _processing(msg="Memproses"):
-    _clear()
-    symbols = ["|", "/", "-", "\\"]
-    start = time.time()
-    i = 0
-    while time.time() - start < 3:
-        print(f"\r{msg} {symbols[i % len(symbols)]}", end="", flush=True)
-        time.sleep(0.15)
-        i += 1
-    _clear()
-
-
+# ------------------------------
+# Nama fungsi: display_seats
+# Penjelasan fungsi : Menampilkan denah kursi bioskop di terminal.
+# Kursi hijau menunjukkan tersedia, X merah menunjukkan terisi.
+# ------------------------------
 def display_seats(available_seats_list: list):
     """
     Menampilkan layout kursi bioskop
@@ -76,16 +67,21 @@ def display_seats(available_seats_list: list):
         console.print(" ".join(row))
 
 
+# ------------------------------
+# Nama fungsi: orderKursi
+# Penjelasan fungsi : Alur pemilihan kursi secara interaktif.
+# Customer memilih kursi satu per satu berdasarkan jumlah tiket yang dipesan.
+# ------------------------------
 def orderKursi(user_ticket: int, available_seats_list: list):
     """
-    Order Kursi
+    Mengelola pemilihan kursi secara interaktif.
 
     Args:
-        user_ticket (int): Jumlah tiket customer
-        available_seats_list (list): Kursi yang tersedia
+        user_ticket (int): Jumlah tiket yang dipesan customer.
+        available_seats_list (list): List kursi yang masih tersedia.
 
     Returns:
-        tuple: (jumlah tiket, kursi yang dipilih)
+        tuple: (jumlah tiket, list kursi yang dipilih).
     """
 
     selected_seats = []
@@ -120,7 +116,13 @@ def orderKursi(user_ticket: int, available_seats_list: list):
     return user_ticket, selected_seats
 
 
+# ------------------------------
+# Nama fungsi: resetOrder
+# Penjelasan fungsi : Mengosongkan struktur antrean (queue dan ticket linked list).
+# Digunakan saat mereset sesi antrean untuk film tertentu.
+# ------------------------------
 def resetOrder(queue, ticket):
+    """Mengosongkan queue dan linked list ticket."""
     queue.front = None
     queue.rear = None
     queue.urutan = 1
