@@ -30,6 +30,9 @@ from rich import print
 from CRUD.utils.clear import _clear
 from CRUD.utils.loading import _processing
 import shutil
+from rich.console import Console
+
+console = Console()
 
 
 # ------------------------------
@@ -110,23 +113,41 @@ def main():
                     case "1. Update":  # Update Film
                         film = getAllData("data_film").get(film_id)
 
-                        print("\n======== Ubah Film ========")
-                        print("Judul \t\t:", film["judul_film"])
-                        print("Kuota Penonton \t:", film["kuota_penonton"])
-                        print("\nKosongkan isian jika tidak ingin mengganti isi data")
+                        console.print("\n[bold]Ubah Film[/bold]")
+                        console.print("[dim]────────────────────────────────[/dim]\n")
+
+                        console.print(
+                            f"[cyan]Judul Film[/cyan]        : {film['judul_film']}"
+                        )
+                        console.print(
+                            f"[cyan]Kuota Penonton[/cyan]   : {film['kuota_penonton']}"
+                        )
+
+                        console.print(
+                            "\n[dim]Kosongkan isian jika tidak ingin mengganti data[/dim]\n"
+                        )
 
                         while True:
-                            judul = input("Judul \t\t: ").strip()
-                            kuota_penonton = input("Kuota Penonton \t: ").strip()
+                            judul = console.input(
+                                "[cyan]Judul Film Baru[/cyan]   : "
+                            ).strip()
+
+                            kuota_penonton = console.input(
+                                "[cyan]Kuota Baru[/cyan]         : "
+                            ).strip()
 
                             if not kuota_penonton or (
                                 kuota_penonton.isdigit()
-                                and 0 < int(kuota_penonton) <= 100
+                                and 0 < int(kuota_penonton) <= 60
                             ):
                                 break
-                            print("Kuota penonton harus berupa angka valid!")
+
+                            console.print(
+                                "\n[red]✗[/red] Kuota penonton harus berupa angka valid dan maksimal 60!\n"
+                            )
 
                         _processing("Menyimpan perubahan...")
+
                         updateFilm(
                             judul_film=judul,
                             kuota_penonton=kuota_penonton,
@@ -134,7 +155,8 @@ def main():
                         )
 
                         _clear()
-                        print("\nFilm berhasil diubah!")
+
+                        console.print("\n[green]✓[/green] Film berhasil diubah!\n")
 
                     case "2. Delete":  # Delete Film
                         _processing("Menghapus film...")
@@ -154,32 +176,43 @@ def main():
 
             case "3. Tambah Film":  # Tambah Film
                 _clear()
+
                 empty = True
-                print("\n======== Tambah Film ========")
-                print("Kosongkan isian untuk membatalkan penambahan film\n")
+
+                console.print("\n[bold]Tambah Film[/bold]")
+                console.print("[dim]────────────────────────────────[/dim]")
+                console.print(
+                    "[dim]Kosongkan isian untuk membatalkan penambahan film[/dim]\n"
+                )
 
                 while True:
-                    judul = input("Judul \t\t\t\t: ").strip()
-                    kuota_penonton = input("Kuota Penonton (maks: 60)\t: ").strip()
+                    judul = console.input("[cyan]Judul Film[/cyan]        \t: ").strip()
+                    kuota_penonton = console.input(
+                        "[cyan]Kuota Penonton[/cyan]   \t: "
+                    ).strip()
 
                     if not judul and not kuota_penonton:
                         break
+
                     if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 60:
-                        empty = not empty
+                        empty = False
                         break
-                    print(
-                        "Kuota penonton harus berupa angka yang valid dan maksimal 60 orang!\n"
+
+                    console.print(
+                        "\n[red]✗[/red] Kuota penonton harus berupa angka valid dan maksimal 60 orang!\n"
                     )
 
                 if empty:
-                    print("Membatalkan penambahan film...")
+                    console.print("\n[yellow]![/yellow] Membatalkan penambahan film...")
                     continue
 
                 _processing("Menyimpan film...")
+
                 addFilm(judul, int(kuota_penonton))
 
                 _clear()
-                print("Film berhasil ditambah!")
+
+                console.print("\n[green]✓[/green] Film berhasil ditambahkan!\n")
 
             case "4. Laporan Penjualan Tiket":
                 _clear()

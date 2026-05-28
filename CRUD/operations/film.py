@@ -22,12 +22,13 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 
-# Utils
-from CRUD.utils.clear import _clear
-
 # Utilities
+from CRUD.utils.clear import _clear
 from CRUD.utils.idGenerator import generateID
 from CRUD.utils.dataOps import getAllData, updateData
+from CRUD.operations.ticket import Ticket
+from CRUD.operations.antrean import resetOrder, _load_queue, _load_tickets
+from CRUD.utils.deleteTempSessions import deleteTempPemesanan, deleteTempSeat
 
 # ------------------------------
 # Nama fungsi: pilihFilm
@@ -53,7 +54,14 @@ def pilihFilm() -> str | None:
     data_film = getAllData("data_film")
 
     # Memasukan judul film ke list
-    title_list = [data["judul_film"] for data in data_film.values()]
+    title_list = [
+        Choice(
+            value=data["judul_film"],
+            name=f"{data['judul_film']} [{data['kuota_penonton']} kuota]",
+        )
+        for data in data_film.values()
+    ]
+
     title_list.append(Choice(value=None, name="--- Keluar ---"))
 
     # Validasi apakah film ada
@@ -138,6 +146,24 @@ def deleteFilm(film_id):
 
     # Ambil data dari database
     data_film = getAllData("data_film")
+
+    # Delete from other database
+    film_title = data_film[film_id]["judul_film"]
+    deleteTempSeat(film_title)
+    deleteTempPemesanan(film_title)
+
+    # Delete Queue and tickets from memory
+    q = _load_queue(film_id, film_title)
+    ll = Ticket()
+    _load_tickets(film_id, film_title, ll)
+    resetOrder(queue=q, ticket=ll)
+
+    # Clear queue file for this film
+    data = getAllData("data_antrean")
+
+    if film_id in data:
+        del data[film_id]
+        updateData(data, "data_antrean")
 
     # Delete data target
     deleted = data_film.pop(film_id, None)

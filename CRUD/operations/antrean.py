@@ -33,6 +33,7 @@ from CRUD.utils.seatSort import seat_sort
 from CRUD.utils.node import Node
 from CRUD.utils.clear import _clear
 from CRUD.utils.loading import _processing
+from CRUD.utils.deleteTempSessions import deleteTempPemesanan, deleteTempSeat
 
 # Untuk interface
 from rich.console import Console
@@ -234,58 +235,6 @@ def _save_tickets(judul_film: str, ll: Ticket):
 
     # Simpan kembali ke file/database
     updateData(temp_log, "temp_log_pemesanan")
-
-
-# ------------------------------
-# Nama fungsi: deleteTempPemesanan
-# Penjelasan fungsi : Menghapus semua record pemesanan sementara
-# dari temp_log_pemesanan.txt berdasarkan judul film.
-# ------------------------------
-def deleteTempPemesanan(judul_film: str):
-    """
-    Menghapus record pemesanan sementara berdasarkan judul film.
-
-    Args:
-        judul_film (str): Judul film yang record-nya akan dihapus.
-    """
-
-    # Mengambil semua data dari database
-    temp_pemesanan_data = getAllData("temp_log_pemesanan")
-
-    # Menyaring data agar hanya menyisakan record yang BUKAN film ini
-    temp_pemesanan_data = {
-        log_id: data
-        for log_id, data in temp_pemesanan_data.items()
-        if data["judul"] != judul_film
-    }
-
-    updateData(temp_pemesanan_data, "temp_log_pemesanan")
-
-
-# ------------------------------
-# Nama fungsi: deleteTempSeat
-# Penjelasan fungsi : Menghapus semua record pemesanan sementara
-# dari temp_seat.txt berdasarkan judul film.
-# ------------------------------
-def deleteTempSeat(judul_film: str):
-    """
-    Menghapus record seat berdasarkan judul film.
-
-    Args:
-        judul_film (str): Judul film yang record-nya akan dihapus.
-    """
-
-    # Mengambil semua data dari database
-    temp_seat_data = getAllData("temp_seat")
-
-    # Menyaring data agar hanya menyisakan record yang BUKAN film ini
-    temp_seat_data = {
-        log_id: data
-        for log_id, data in temp_seat_data.items()
-        if data["judul_film"] != judul_film
-    }
-
-    updateData(temp_seat_data, "temp_seat")
 
 
 # ------------------------------
@@ -671,6 +620,10 @@ def sistemAntrean(film_id: str):
                 # delete seat data at temp_seat and reset seat availability
                 deleteTempSeat(judul_film)
                 available_ticket = int(film_dict[film_id]["kuota_penonton"])
+                available_seat = [
+                    "K" + str(i)
+                    for i in range(1, int(film_dict[film_id]["kuota_penonton"]) + 1)
+                ]
 
                 # Clear queue file for this film
                 data = getAllData("data_antrean")
