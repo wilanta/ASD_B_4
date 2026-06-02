@@ -33,8 +33,8 @@ class Ticket:
     """Linked list untuk data pemesanan tiket bioskop."""
 
     def __init__(self):
-        self.head = None
-        self.tail = None
+        self.head = None  # Pointer ke node pertama linked list
+        self.tail = None  # Pointer ke node terakhir linked list
 
     # ------------------------------
     # Nama fungsi: addTicket
@@ -71,6 +71,7 @@ class Ticket:
     # ------------------------------
     def isEmpty(self):
         "Mengecek apakah linked list kosong."
+        # True jika head belum menunjuk ke node manapun
         return self.head is None
 
     # ------------------------------
@@ -99,14 +100,20 @@ class Ticket:
         table.add_column("No", justify="center", width=5)
         table.add_column("Nama", width=20)
         table.add_column("Jumlah Tiket", justify="center", width=15)
+        table.add_column("Nomor Kursi", width=25)
         table.add_column("Tanggal", width=20)
 
+        # Traversal linked list dan tampilkan setiap record ke tabel
         current = self.head
         i = 1
 
         while current:
             table.add_row(
-                str(i), current.nama, str(current.jumlah_tiket), str(current.create_at)
+                str(i),
+                current.nama,
+                str(current.jumlah_tiket),
+                str(" | ".join(current.nomor_kursi)),
+                str(current.create_at),
             )
             current = current.next
             i += 1
@@ -131,13 +138,13 @@ class Ticket:
         current = self.head  # Variabel sementara dari awal node
 
         # Jika nama ditemukan di awal node, hapuskan dan return jumlah tiket customer
-        if current and current.nama == nama:
+        if current and current.nama.strip().lower() == nama.strip().lower():
             self.head = current.next
             return current.jumlah_tiket, current.nomor_kursi
 
         # Traverse dari awal hingga ketemu nama
         prev = None
-        while current and current.nama != nama:
+        while current and current.nama.strip().lower() != nama.strip().lower():
             prev = current
             current = current.next
 
@@ -169,6 +176,7 @@ class Ticket:
         found = False
         console = Console()
 
+        # Iterasi seluruh list dan tampilkan detail untuk node yang cocok
         while current:
             if current.nama.lower() == nama.lower():
                 detail_table = Table(
@@ -195,3 +203,67 @@ class Ticket:
             current = current.next
 
         return found
+
+    # ------------------------------
+    # Nama fungsi: deleteTicketByComposite
+    # Penjelasan fungsi : Menghapus record pemesanan berdasarkan
+    # composite key (nama + jumlah tiket + nomor kursi) untuk
+    # menangani kasus nama duplikat.
+    # ------------------------------
+    def deleteTicketByComposite(
+        self, nama: str, jumlah_tiket: int | str = None, nomor_kursi: list = None
+    ):
+        """
+        Menghapus record pemesanan berdasarkan composite key.
+
+        Args:
+            nama (str): Nama customer.
+            jumlah_tiket (int | str, optional): Jumlah tiket customer (string dari file atau int dari node).
+            nomor_kursi (list, optional): Daftar nomor kursi customer.
+
+        Returns:
+            tuple: (jumlah_tiket, nomor_kursi) yang dikembalikan, atau (None, None) jika tidak ditemukan.
+        """
+        current = self.head
+
+        # Traversal list dan cocokkan composite key
+        while current is not None:
+            # Skip node dengan nama yang tidak cocok
+            if current.nama.strip().lower() != nama.strip().lower():
+                current = current.next
+                continue
+
+            # Cek jumlah_tiket jika disediakan (normalisasi ke int untuk perbandingan robust)
+            if jumlah_tiket is not None and current.jumlah_tiket != int(jumlah_tiket):
+                current = current.next
+                continue
+
+            # Cek nomor_kursi jika disediakan (strip spasi dan ignore urutan)
+            if nomor_kursi is not None:
+                kursi_normalized = [k.strip() for k in nomor_kursi if k and k.strip()]
+                current_normalized = [k.strip() for k in current.nomor_kursi if k and k.strip()]
+                if sorted(current_normalized) != sorted(kursi_normalized):
+                    current = current.next
+                    continue
+
+            # Jika sampai sini, node cocok
+            refunded_ticket = current.jumlah_tiket
+            refunded_seat = current.nomor_kursi
+
+            # Hapus node dari linked list (handle kasus head & non-head)
+            if current == self.head:
+                self.head = current.next
+                if self.head is None:
+                    self.tail = None
+            else:
+                # Cari node sebelum current untuk menyambungkan list
+                prev = self.head
+                while prev.next != current:
+                    prev = prev.next
+                prev.next = current.next
+                if current.next is None:
+                    self.tail = prev
+
+            return refunded_ticket, refunded_seat
+
+        return None, None

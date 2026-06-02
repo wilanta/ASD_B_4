@@ -23,8 +23,8 @@ def getAllData(data_name: str) -> dict:
 
     Returns:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
-        "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
-        "temp_log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
+        "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ..., 'nomor_kursi': [...]}}
+        "temp_log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ..., 'nomor_kursi': [...]}}
         "data_antrean" -> {film_id: {'urutan_counter': int, 'nodes': [Node dict list]}}
         "temp_seat" -> {film_id: {'judul_film': str, 'available_seat': [List kursi]}}
     """
@@ -34,6 +34,7 @@ def getAllData(data_name: str) -> dict:
     file_path = os.path.abspath(file_path)
 
     try:
+        # Baca file baris per baris dan parse sesuai data_name
         with open(file_path, "r", encoding="utf-8") as d:
             for row in d:
                 row = row.strip()
@@ -41,6 +42,7 @@ def getAllData(data_name: str) -> dict:
                     continue
                 list_row = row.split(",")
 
+                # Parse khusus untuk data_antrean (format COUNTER & QUEUE)
                 if data_name.lower() == "data_antrean":
                     if list_row[0] == "COUNTER":
                         film_id = list_row[1]
@@ -78,36 +80,80 @@ def getAllData(data_name: str) -> dict:
                         data[film_id]["nodes"].append(node)
                     continue
 
-                if (len(list_row) != 3 and data_name.lower() == "data_film") or (
-                    len(list_row) != 6 and data_name.lower() == "log_pemesanan"
-                ):
-                    continue
-
                 if data_name.lower() == "data_film":
+                    # Parse baris data_film: film_id,judul,kuota
                     film_id, judul_film, kuota_penonton = list_row
                     data[film_id] = {
                         "judul_film": judul_film,
                         "kuota_penonton": kuota_penonton,
                     }
                 elif data_name.lower() == "log_pemesanan":
-                    log_id, nama, jumlah_tiket, urutan_antrean, judul, date = list_row
+                    # Validasi jumlah kolom minimal
+                    if len(list_row) < 7:
+                        print(
+                            f"[warn] skipped malformed row in log_pemesanan: {row}"
+                        )
+                        continue
+
+                    # Parse baris log_pemesanan
+                    (
+                        log_id,
+                        nama,
+                        jumlah_tiket,
+                        urutan_antrean,
+                        judul,
+                        date,
+                        nomor_kursi_raw,
+                    ) = list_row[:7]
+
+                    # Pisahkan nomor kursi berdasarkan delimiter "|"
+                    nomor_kursi = (
+                        [k for k in nomor_kursi_raw.split("|") if k]
+                        if nomor_kursi_raw
+                        else []
+                    )
+
                     data[log_id] = {
                         "nama": nama,
                         "jumlah_tiket": jumlah_tiket,
                         "urutan_antrean": urutan_antrean,
                         "judul": judul,
                         "date": date,
+                        "nomor_kursi": nomor_kursi,
                     }
                 elif data_name.lower() == "temp_log_pemesanan":
-                    log_id, nama, jumlah_tiket, urutan_antrean, judul, date = list_row
+                    if len(list_row) < 7:
+                        print(
+                            f"[warn] skipped malformed row in temp_log_pemesanan: {row}"
+                        )
+                        continue
+
+                    (
+                        log_id,
+                        nama,
+                        jumlah_tiket,
+                        urutan_antrean,
+                        judul,
+                        date,
+                        nomor_kursi_raw,
+                    ) = list_row[:7]
+
+                    nomor_kursi = (
+                        [k for k in nomor_kursi_raw.split("|") if k]
+                        if nomor_kursi_raw
+                        else []
+                    )
+
                     data[log_id] = {
                         "nama": nama,
                         "jumlah_tiket": jumlah_tiket,
                         "urutan_antrean": urutan_antrean,
                         "judul": judul,
                         "date": date,
+                        "nomor_kursi": nomor_kursi,
                     }
                 elif data_name.lower() == "temp_seat":
+                    # Parse baris temp_seat: film_id,judul,k1,k2,...
                     film_id, judul_film, *available_seat = list_row
                     data[film_id] = {
                         "judul_film": judul_film,
@@ -115,6 +161,7 @@ def getAllData(data_name: str) -> dict:
                     }
 
     except FileNotFoundError:
+        # Kembalikan dict kosong jika file belum ada
         return data
     except Exception as e:
         print(f"Gagal mengambil data | Error: {e}")
@@ -132,7 +179,7 @@ def searchData(target_id: str, data_name: str) -> dict | None:
 
     Return:
         "data_film" -> {film_id: {'judul_film': ..., 'kuota_penonton': ...}}
-        "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ...}}
+        "log_pemesanan" -> {log_id: {'nama': ..., 'jumlah_tiket': ..., 'urutan_antrean': ..., 'judul': ..., 'date': ..., 'nomor_kursi': [...]}}
         "temp_seat" -> {film_id: {'judul_film': str, 'available_seat': [List kursi]}}
     """
 
@@ -140,6 +187,7 @@ def searchData(target_id: str, data_name: str) -> dict | None:
     result = {}
 
     if target_id in data:
+        # Susun ulang hasil berdasarkan tipe data
         if data_name.lower() == "data_film":
             judul_film = data[target_id]["judul_film"]
             kuota_penonton = data[target_id]["kuota_penonton"]
@@ -153,12 +201,14 @@ def searchData(target_id: str, data_name: str) -> dict | None:
             urutan_antrean = data[target_id]["urutan_antrean"]
             judul = data[target_id]["judul"]
             date = data[target_id]["date"]
+            nomor_kursi = data[target_id]["nomor_kursi"]
             result[target_id] = {
                 "nama": nama,
                 "jumlah_tiket": jumlah_tiket,
                 "urutan_antrean": urutan_antrean,
                 "judul": judul,
                 "date": date,
+                "nomor_kursi": nomor_kursi,
             }
         elif data_name.lower() == "temp_seat":
             judul_film = data[target_id]["judul_film"]
@@ -200,13 +250,18 @@ def updateData(data_dict: dict, data_name: str):
     file_path = os.path.abspath(file_path)
 
     try:
+        # Tulis data_film: film_id,judul,kuota per baris
         if data_name.lower() == "data_film":
             with open(file_path, "w", encoding="utf-8") as d:
                 for film_id in data_dict.keys():
                     judul_film = data_dict[film_id]["judul_film"]
                     kuota_penonton = data_dict[film_id]["kuota_penonton"]
                     d.write(f"{film_id},{judul_film},{kuota_penonton}\n")
+
+        # log_pemesanan
+
         elif data_name.lower() == "log_pemesanan":
+            # Tulis log permanent, gabung nomor kursi dengan "|"
             with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():
                     nama = data_dict[log_id]["nama"]
@@ -214,18 +269,38 @@ def updateData(data_dict: dict, data_name: str):
                     urutan_antrean = data_dict[log_id]["urutan_antrean"]
                     judul = data_dict[log_id]["judul"]
                     date = data_dict[log_id]["date"]
-                    d.write(
-                        f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n"
+                    nomor_kursi = data_dict[log_id]["nomor_kursi"]
+
+                    # Gabung list kursi jadi string dengan delimiter "|"
+                    nomor_kursi_str = (
+                        "|".join(nomor_kursi) if nomor_kursi else ""
                     )
+
+                    row_field = ",".join(
+                        [
+                            str(log_id),
+                            str(nama),
+                            str(jumlah_tiket),
+                            str(urutan_antrean),
+                            str(judul),
+                            str(date),
+                            nomor_kursi_str,
+                        ]
+                    )
+                    d.write(f"{row_field}\n")
+
+        # temp_seat: film_id,judul,k1,k2,...
         elif data_name.lower() == "temp_seat":
             with open(file_path, "w", encoding="utf-8") as d:
                 for film_id in data_dict.keys():
                     judul_film = data_dict[film_id]["judul_film"]
                     available_seat = data_dict[film_id]["available_seat"]
 
+                    # Gabung film_id, judul dan semua kursi jadi satu baris
                     row_field = ",".join([film_id, judul_film] + available_seat)
-                    print("helo world dajinduabdyuadgauv bway")
                     d.write(f"{row_field}\n")
+
+        # temp_log_pemesanan: format sama seperti log_pemesanan
         elif data_name.lower() == "temp_log_pemesanan":
             with open(file_path, "w", encoding="utf-8") as d:
                 for log_id in data_dict.keys():
@@ -234,13 +309,32 @@ def updateData(data_dict: dict, data_name: str):
                     urutan_antrean = data_dict[log_id]["urutan_antrean"]
                     judul = data_dict[log_id]["judul"]
                     date = data_dict[log_id]["date"]
-                    d.write(
-                        f"{log_id},{nama},{jumlah_tiket},{urutan_antrean},{judul},{date}\n"
+                    nomor_kursi = data_dict[log_id]["nomor_kursi"]
+
+                    nomor_kursi_str = (
+                        "|".join(nomor_kursi) if nomor_kursi else ""
                     )
+
+                    row_field = ",".join(
+                        [
+                            str(log_id),
+                            str(nama),
+                            str(jumlah_tiket),
+                            str(urutan_antrean),
+                            str(judul),
+                            str(date),
+                            nomor_kursi_str,
+                        ]
+                    )
+                    d.write(f"{row_field}\n")
+
+        # data_antrean: tulis COUNTER per film dan QUEUE per node
         elif data_name.lower() == "data_antrean":
             with open(file_path, "w", encoding="utf-8") as d:
                 for film_id, film_data in data_dict.items():
+                    # Tulis counter urutan antrean
                     d.write(f"COUNTER,{film_id},{film_data.get('urutan_counter', 1)}\n")
+                    # Tulis setiap node sebagai baris QUEUE
                     for node in film_data.get("nodes", []):
                         nomor_kursi_str = (
                             "|".join(node["nomor_kursi"]) if node["nomor_kursi"] else ""

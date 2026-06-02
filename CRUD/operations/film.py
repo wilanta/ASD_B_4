@@ -155,7 +155,7 @@ def deleteFilm(film_id):
     # Delete Queue and tickets from memory
     q = _load_queue(film_id, film_title)
     ll = Ticket()
-    _load_tickets(film_id, film_title, ll)
+    _load_tickets(film_title, ll)
     resetOrder(queue=q, ticket=ll)
 
     # Clear queue file for this film

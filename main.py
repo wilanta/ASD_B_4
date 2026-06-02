@@ -53,11 +53,13 @@ def main():
 [/bold white]
 """)
         width = shutil.get_terminal_size().columns
+        # Cetak garis pemisah sepanjang lebar terminal
         print("-" * width)
 
         print("[bold white]Pilih menu yang ingin diakses[/bold white]")
         print("[dim]Pilih untuk melanjutkan.[/dim]\n")
 
+        # Cetak garis pemisah sebelum daftar pilihan
         print("-" * width)
 
         # Menampilkan pilihan dan meminta pilihan dari user
@@ -81,7 +83,7 @@ def main():
                 # Memanggil pilihFilm untuk memilih film yang akan dioperasikan antreannya
                 film_id = pilihFilm()
 
-                # Memanggil fungsi sistem antrean
+                # Validasi film_id dan panggil sistem antrean
                 if film_id:
                     _clear()
                     sistemAntrean(film_id)
@@ -97,6 +99,7 @@ def main():
                 if film_id is None:
                     continue
 
+                # Tampilkan sub-menu untuk update atau delete film
                 choice = inquirer.select(
                     message="",
                     choices=[
@@ -113,9 +116,11 @@ def main():
                     case "1. Update":  # Update Film
                         film = getAllData("data_film").get(film_id)
 
+                        # Tampilkan header form ubah film
                         console.print("\n[bold]Ubah Film[/bold]")
                         console.print("[dim]────────────────────────────────[/dim]\n")
 
+                        # Tampilkan data film saat ini
                         console.print(
                             f"[cyan]Judul Film[/cyan]        : {film['judul_film']}"
                         )
@@ -127,6 +132,7 @@ def main():
                             "\n[dim]Kosongkan isian jika tidak ingin mengganti data[/dim]\n"
                         )
 
+                        # Input judul dan kuota baru dengan validasi
                         while True:
                             judul = console.input(
                                 "[cyan]Judul Film Baru[/cyan]   : "
@@ -136,6 +142,14 @@ def main():
                                 "[cyan]Kuota Baru[/cyan]         : "
                             ).strip()
 
+                            # Judul tidak boleh mengandung koma (delimiter CSV)
+                            if "," in judul:
+                                console.print(
+                                    "\n[red]✗[/red] Judul film tidak boleh mengandung koma (,)\n"
+                                )
+                                continue
+
+                            # Kuota boleh kosong atau angka 1-60
                             if not kuota_penonton or (
                                 kuota_penonton.isdigit()
                                 and 0 < int(kuota_penonton) <= 60
@@ -148,6 +162,7 @@ def main():
 
                         _processing("Menyimpan perubahan...")
 
+                        # Panggil updateFilm dengan nilai baru (atau kosong = keep)
                         updateFilm(
                             judul_film=judul,
                             kuota_penonton=kuota_penonton,
@@ -160,6 +175,7 @@ def main():
 
                     case "2. Delete":  # Delete Film
                         _processing("Menghapus film...")
+                        # Panggil deleteFilm untuk hapus dari database
                         deleteFilm(film_id)
 
                         _clear()
@@ -177,23 +193,35 @@ def main():
             case "3. Tambah Film":  # Tambah Film
                 _clear()
 
+                # Flag untuk menandai form kosong (batal tambah)
                 empty = True
 
+                # Tampilkan header form tambah film
                 console.print("\n[bold]Tambah Film[/bold]")
                 console.print("[dim]────────────────────────────────[/dim]")
                 console.print(
                     "[dim]Kosongkan isian untuk membatalkan penambahan film[/dim]\n"
                 )
 
+                # Input judul & kuota dengan validasi
                 while True:
                     judul = console.input("[cyan]Judul Film[/cyan]        \t: ").strip()
                     kuota_penonton = console.input(
                         "[cyan]Kuota Penonton[/cyan]   \t: "
                     ).strip()
 
+                    # Jika keduanya kosong, anggap user membatalkan
                     if not judul and not kuota_penonton:
                         break
 
+                    # Judul tidak boleh mengandung koma (delimiter CSV)
+                    if "," in judul:
+                        console.print(
+                            "\n[red]✗[/red] Judul film tidak boleh mengandung koma (,)\n"
+                        )
+                        continue
+
+                    # Validasi kuota sebagai angka 1-60
                     if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 60:
                         empty = False
                         break
@@ -202,12 +230,14 @@ def main():
                         "\n[red]✗[/red] Kuota penonton harus berupa angka valid dan maksimal 60 orang!\n"
                     )
 
+                # Jika form kosong, batalkan penambahan
                 if empty:
                     console.print("\n[yellow]![/yellow] Membatalkan penambahan film...")
                     continue
 
                 _processing("Menyimpan film...")
 
+                # Tambah film ke database
                 addFilm(judul, int(kuota_penonton))
 
                 _clear()
@@ -216,13 +246,16 @@ def main():
 
             case "4. Laporan Penjualan Tiket":
                 _clear()
+                # Ambil data log_pemesanan permanent sebagai sumber laporan
                 data = getAllData("log_pemesanan")
 
+                # Jika belum ada data, tampilkan pesan dan kembali ke menu
                 if not data:
                     print("Data log_pemesanan kosong!")
                     continue
 
                 _processing("Membuat laporan...")
+                # Generate laporan penjualan tiket
                 generateReport(data)
 
                 _clear()

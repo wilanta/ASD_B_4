@@ -40,18 +40,9 @@ class Queue:
     # Penjelasan fungsi : Inisialisasi struktur antrean kosong.
     # ------------------------------
     def __init__(self):
-        self.front = None
-        self.rear = None
-        self.urutan = 1
-
-    # ------------------------------
-    # Nama fungsi: __init__
-    # Penjelasan fungsi : Inisialisasi struktur antrean kosong.
-    # ------------------------------
-    def __init__(self):
-        self.front = None
-        self.rear = None
-        self.urutan = 1
+        self.front = None  # Pointer ke node terdepan antrean
+        self.rear = None  # Pointer ke node terakhir antrean
+        self.urutan = 1  # Counter untuk nomor urutan antrean berikutnya
 
     # ------------------------------
     # Nama fungsi: isEmpty
@@ -59,6 +50,7 @@ class Queue:
     # ------------------------------
     def isEmpty(self):
         "Mengecek apakah antrean kosong."
+        # True jika pointer front belum menunjuk ke node manapun
         return self.front is None
 
     # ------------------------------
@@ -83,14 +75,18 @@ class Queue:
         Args:
             nama (str): Nama customer yang ditambahkan ke antrean.
         """
+        # Buat node baru dengan nomor urut saat ini
         new_node = Node(nama, urutan_antrean=self.urutan)
+        # Increment counter untuk customer berikutnya
         self.urutan += 1
 
         if self.isEmpty():
+            # Jika antrean kosong, node baru menjadi front sekaligus rear
             self.front = new_node
             self.rear = new_node
             return
 
+        # Jika antrean sudah ada, sambungkan node baru di belakang (rear)
         self.rear.next = new_node
         self.rear = new_node
 
@@ -112,6 +108,7 @@ class Queue:
             print("Antrean kosong!")
             return None
 
+        # Update atribut customer di node front dengan data pemesanan
         self.front.jumlah_tiket = jumlah_tiket
         self.front.nomor_kursi = nomor_kursi
         self.front.judul_film = judul_film
@@ -133,9 +130,12 @@ class Queue:
             print("Antrean kosong!")
             return None
 
+        # Ambil node front sebagai node yang dilayani
         node_dilayani = self.front
+        # Geser pointer front ke node berikutnya
         self.front = self.front.next
 
+        # Jika setelah geser front menjadi None, rear juga harus None
         if self.front is None:
             self.rear = None
 
@@ -169,6 +169,7 @@ class Queue:
         table.add_column("No", justify="center", width=6)
         table.add_column("Nama", justify="left")
 
+        # Traversal dari front ke rear untuk mengisi baris tabel
         current = self.front
         no = 1
 
@@ -197,6 +198,7 @@ class Queue:
         count = 0
         current = self.front
 
+        # Iterasi seluruh node dan hitung node dengan nama yang cocok
         while current is not None:
             if current.nama == nama.lower():
                 count += 1
@@ -220,6 +222,7 @@ class Queue:
 
         current = start_node
 
+        # Turunkan nomor urut setiap node setelah node yang dihapus
         while current is not None:
             current.urutan_antrean -= 1
             current = current.next
@@ -273,15 +276,22 @@ class Queue:
                 if urutan_batal in urutan_list:
                     break
 
-            if self.front.nama == nama and self.front.urutan_antrean == urutan_batal:
+            if (
+                self.front.nama == nama.lower()
+                and self.front.urutan_antrean == urutan_batal
+            ):
                 self.front = self.front.next
+                if self.front is None:
+                    self.rear = None
+                self.urutan -= 1
                 self.adjustAntrean(self.front)
                 return nama, urutan_batal
 
             current = self.front
             while current is not None:
                 if (
-                    current.next.nama == nama
+                    current.next is not None
+                    and current.next.nama == nama.lower()
                     and current.next.urutan_antrean == urutan_batal
                 ):
                     current.next = current.next.next
@@ -289,25 +299,32 @@ class Queue:
                     if current.next is None:
                         self.rear = current
 
-                    self.adjustAntrean(current.next)
+                    self.urutan -= 1
+
+                    if current.next is not None:
+                        self.adjustAntrean(current.next)
 
                     return nama, urutan_batal
                 current = current.next
 
         else:
-            if self.front.nama == nama:
+            if self.front.nama == nama.lower():
                 self.front = self.front.next
+                if self.front is None:
+                    self.rear = None
+                self.urutan -= 1
                 self.adjustAntrean(self.front)
                 return nama, urutan_batal
 
             current = self.front
             while current.next is not None:
-                if current.next.nama == nama:
+                if current.next.nama == nama.lower():
                     current.next = current.next.next
 
                     if current.next is None:
                         self.rear = current
 
+                    self.urutan -= 1
                     self.adjustAntrean(current.next)
 
                     return nama, urutan_batal
