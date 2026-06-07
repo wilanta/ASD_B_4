@@ -1,5 +1,4 @@
 from CRUD.utils.dataOps import getAllData, updateData
-from CRUD.utils.seatSort import seat_sort
 
 
 # ------------------------------
