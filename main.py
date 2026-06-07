@@ -139,7 +139,7 @@ def main():
                             ).strip()
 
                             kuota_penonton = console.input(
-                                "[cyan]Kuota Baru[/cyan]         : "
+                                "[cyan]Kuota Baru[/cyan]        : "
                             ).strip()
 
                             # Judul tidak boleh mengandung koma (delimiter CSV)
