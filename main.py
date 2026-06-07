@@ -1,15 +1,14 @@
 """
 ==========================================================
 Main Menu
-Berisi menu sistem kontrol dan navigasi untuk ke fitur
+Titik masuk utama aplikasi BIOSKOP CACB.
+Berisi navigasi menu dan kontrol ke seluruh fitur sistem.
 
 Kontributor : Wildhan Dzikrihantara, M. Lutfi Ramadhan Warendra
-Fungsi/fitur:
-1. main
-2. sistemAntrean
-3. pilihFilm
-==========================================================
 
+Fungsi/fitur:
+1. main - Menampilkan menu utama dan mengarahkan ke fitur yang dipilih
+==========================================================
 """
 
 # Import features yang akan digunakan di main
@@ -28,7 +27,12 @@ from CRUD.operations.report import generateReport
 # Untuk interface
 from InquirerPy import inquirer
 from rich import print
+from CRUD.utils.clear import _clear
+from CRUD.utils.loading import _processing
 import shutil
+from rich.console import Console
+
+console = Console()
 
 
 # ------------------------------
@@ -36,8 +40,8 @@ import shutil
 # Penjelasan fungsi : Untuk tampilan dan kontrol main menu.
 # ------------------------------
 def main():
-    # menampilkam menu utama secara berulang sampai user memilih untuk keluar
     while True:
+        _clear()
         print("""
 [bold white]
 ██████╗ ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗      ██████╗ █████╗  ██████╗██████╗
@@ -49,11 +53,13 @@ def main():
 [/bold white]
 """)
         width = shutil.get_terminal_size().columns
+        # Cetak garis pemisah sepanjang lebar terminal
         print("-" * width)
 
         print("[bold white]Pilih menu yang ingin diakses[/bold white]")
         print("[dim]Pilih untuk melanjutkan.[/dim]\n")
 
+        # Cetak garis pemisah sebelum daftar pilihan
         print("-" * width)
 
         # Menampilkan pilihan dan meminta pilihan dari user
@@ -77,19 +83,23 @@ def main():
                 # Memanggil pilihFilm untuk memilih film yang akan dioperasikan antreannya
                 film_id = pilihFilm()
 
-                # Memanggil fungsi sistem antrean
+                # Validasi film_id dan panggil sistem antrean
                 if film_id:
+                    _clear()
                     sistemAntrean(film_id)
                 else:
+                    _clear()
                     print("Tidak sesuai nomor di urutan. Kembali ke menu utama...")
 
             case "2. Daftar Film":  # Show film
+                _clear()
                 film_id = pilihFilm()
 
                 # Film_id validator
                 if film_id is None:
                     continue
 
+                # Tampilkan sub-menu untuk update atau delete film
                 choice = inquirer.select(
                     message="",
                     choices=[
@@ -106,87 +116,170 @@ def main():
                     case "1. Update":  # Update Film
                         film = getAllData("data_film").get(film_id)
 
-                        # Title ubah film
-                        print("\n======== Ubah Film ========")
-                        print("Judul \t\t:", film["judul_film"])
-                        print("Kuota Penonton \t:", film["kuota_penonton"])
-                        print("\nKosongkan isian jika tidak ingin mengganti isi data")
+                        # Tampilkan header form ubah film
+                        console.print("\n[bold]Ubah Film[/bold]")
+                        console.print("[dim]────────────────────────────────[/dim]\n")
 
-                        # Input data film dan Loop hingga operasi selesai
+                        # Tampilkan data film saat ini
+                        console.print(
+                            f"[cyan]Judul Film[/cyan]        : {film['judul_film']}"
+                        )
+                        console.print(
+                            f"[cyan]Kuota Penonton[/cyan]   : {film['kuota_penonton']}"
+                        )
+
+                        console.print(
+                            "\n[dim]Kosongkan isian jika tidak ingin mengganti data[/dim]\n"
+                        )
+
+                        # Input judul dan kuota baru dengan validasi
                         while True:
-                            judul = input("Judul \t\t: ").strip()
-                            kuota_penonton = input("Kuota Penonton \t: ").strip()
+                            judul = console.input(
+                                "[cyan]Judul Film Baru[/cyan]   : "
+                            ).strip()
 
-                            # Validasi kuota penonton harus berupa angka
+                            kuota_penonton = console.input(
+                                "[cyan]Kuota Baru[/cyan]        : "
+                            ).strip()
+
+                            # Judul tidak boleh mengandung koma (delimiter CSV)
+                            if "," in judul:
+                                console.print(
+                                    "\n[red]✗[/red] Judul film tidak boleh mengandung koma (,)\n"
+                                )
+                                continue
+
+                            # Jika terdapat data film yang sama di database dengan yang ditambahkkan, hentikan penambahan film
+                            data_film = getAllData("data_film")
+                            if any(
+                                judul == film["judul_film"]
+                                for film in data_film.values()
+                            ):
+                                console.print(
+                                    "[red]✗ Tidak dapat mengganti judul film[/red]: judul yang sama sudah terdaftar."
+                                )
+                                continue
+
+                            # Kuota boleh kosong atau angka 1-60
                             if not kuota_penonton or (
                                 kuota_penonton.isdigit()
-                                and 0 < int(kuota_penonton) <= 100
+                                and 0 < int(kuota_penonton) <= 60
                             ):
                                 break
-                            print("Kuota penonton harus berupa angka valid!")
 
-                        # Ubah data film di database
+                            console.print(
+                                "\n[red]✗[/red] Kuota penonton harus berupa angka valid dan maksimal 60!\n"
+                            )
+
+                        _processing("Menyimpan perubahan...")
+
+                        # Panggil updateFilm dengan nilai baru (atau kosong = keep)
                         updateFilm(
                             judul_film=judul,
                             kuota_penonton=kuota_penonton,
                             film_id=film_id,
                         )
 
-                        print("Film berhasil diubah!")
+                        _clear()
+
+                        console.print("\n[green]✓[/green] Film berhasil diubah!\n")
 
                     case "2. Delete":  # Delete Film
+                        _processing("Menghapus film...")
+                        # Panggil deleteFilm untuk hapus dari database
                         deleteFilm(film_id)
 
+                        _clear()
                         print("Film berhasil dihapus!")
 
                     case "0. Kembali":  # Kembali ke menu utama
+                        _clear()
                         print("Kembali ke menu utama.")
                         continue
 
                     case _:  # Pilihan tidak valid
                         print("Pilihan tidak valid!")
+                        continue
 
             case "3. Tambah Film":  # Tambah Film
-                empty = True  # Flag untuk mengecek input kosong
-                # Title tambah film
-                print("\n======== Tambah Film ========")
-                print("Kosongkan isian untuk membatalkan penambahan film\n")
+                _clear()
 
-                # Input data film dan Loop hingga operasi selesai
+                # Flag untuk menandai form kosong (batal tambah)
+                empty = True
+
+                # Tampilkan header form tambah film
+                console.print("\n[bold]Tambah Film[/bold]")
+                console.print("[dim]────────────────────────────────[/dim]")
+                console.print(
+                    "[dim]Kosongkan isian untuk membatalkan penambahan film[/dim]\n"
+                )
+
+                # Input judul & kuota dengan validasi
                 while True:
-                    judul = input("Judul \t\t\t\t: ").strip()
-                    kuota_penonton = input("Kuota Penonton (maks: 60)\t: ").strip()
+                    judul = console.input("[cyan]Judul Film[/cyan]        \t: ").strip()
+                    kuota_penonton = console.input(
+                        "[cyan]Kuota Penonton[/cyan]   \t: "
+                    ).strip()
 
-                    # Jika input kosong, aktifkan flag
-                    if not judul and not kuota_penonton:
+                    # Jika salah satunya kosong, anggap user membatalkan
+                    if not judul or not kuota_penonton:
                         break
-                    # Validasi kuota penonton harus berupa angka
+
+                    # Judul tidak boleh mengandung koma (delimiter CSV)
+                    if "," in judul:
+                        console.print(
+                            "\n[red]✗[/red] Judul film tidak boleh mengandung koma (,)\n"
+                        )
+                        continue
+
+                    # Validasi kuota sebagai angka 1-60
                     if kuota_penonton.isdigit() and 0 < int(kuota_penonton) <= 60:
-                        empty = not empty
+                        empty = False
                         break
-                    print(
-                        "Kuota penonton harus berupa angka yang valid dan maksimal 60 orang!\n"
+
+                    console.print(
+                        "\n[red]✗[/red] Kuota penonton harus berupa angka valid dan maksimal 60 orang!\n"
                     )
 
-                # Jika tidak diberi input, batalkan penambahan film
+                # Jika form kosong, batalkan penambahan
                 if empty:
-                    print("Membatalkan penambahan film...")
+                    console.print("\n[yellow]![/yellow] Membatalkan penambahan film...")
                     continue
 
-                # Tambahkan film baru ke database
-                addFilm(judul, int(kuota_penonton))
-                print("Film berhasil ditambah!")
+                _processing("Menyimpan film...")
+
+                # Tambah film ke database
+                add_status = addFilm(judul, int(kuota_penonton))
+
+                if not add_status:
+                    console.print(
+                        "[red]✗ Gagal menambahkan film[/red]: judul yang sama sudah terdaftar."
+                    )
+                    input("[Tekan enter untuk kembali]")
+
+                _clear()
+
+                console.print("\n[green]✓[/green] Film berhasil ditambahkan!\n")
 
             case "4. Laporan Penjualan Tiket":
+                _clear()
+                # Ambil data log_pemesanan permanent sebagai sumber laporan
                 data = getAllData("log_pemesanan")
 
+                # Jika belum ada data, tampilkan pesan dan kembali ke menu
                 if not data:
                     print("Data log_pemesanan kosong!")
-                    return
+                    continue
 
+                _processing("Membuat laporan...")
+                # Generate laporan penjualan tiket
                 generateReport(data)
 
+                _clear()
+                print("Laporan berhasil dibuat!")
+
             case "0. Keluar":  # Kembali ke menu utama
+                _clear()
                 print("Program dihentikan.")
                 break
 
@@ -194,6 +287,5 @@ def main():
                 print("Pilihan tidak valid!\n")
 
 
-# Untuk menjalankan fungsi main secara langsung
 if __name__ == "__main__":
     main()

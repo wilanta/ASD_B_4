@@ -5,3 +5,5 @@ CRUD/data/*
 !CRUD/data/.gitkeep
 CRUD/history/*/*
 !CRUD/history/invoices/.gitkeep
+!CRUD/history/reports/.gitkeep
+REPORT_TESTING.txt
