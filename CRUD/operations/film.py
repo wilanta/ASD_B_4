@@ -19,7 +19,6 @@ from rich import print
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 
 # Utilities
