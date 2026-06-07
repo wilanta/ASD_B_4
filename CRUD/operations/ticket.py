@@ -241,7 +241,9 @@ class Ticket:
             # Cek nomor_kursi jika disediakan (strip spasi dan ignore urutan)
             if nomor_kursi is not None:
                 kursi_normalized = [k.strip() for k in nomor_kursi if k and k.strip()]
-                current_normalized = [k.strip() for k in current.nomor_kursi if k and k.strip()]
+                current_normalized = [
+                    k.strip() for k in current.nomor_kursi if k and k.strip()
+                ]
                 if sorted(current_normalized) != sorted(kursi_normalized):
                     current = current.next
                     continue

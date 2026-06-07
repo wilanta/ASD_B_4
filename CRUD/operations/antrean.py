@@ -467,10 +467,19 @@ def sistemAntrean(film_id: str):
                 # Maksimum tiket yang boleh dipesan per customer
                 max_kursi_per_cust = 4
 
+                out = False
                 while True:
                     try:
                         # Input jumlah tiket dengan validasi range
-                        user_ticket = int(input("Masukkan jumlah tiket yang dipesan: "))
+                        user_input = input(
+                            "\nMasukkan jumlah tiket yang dipesan [Kosongkan isi dan enter untuk kembali]: "
+                        ).strip()
+
+                        if not user_input:
+                            out = True
+                            break
+
+                        user_ticket = int(user_input)
 
                         if user_ticket < 1 or user_ticket > max_kursi_per_cust:
                             print("[bold red]Hanya bisa memesan 1-4 tiket![/bold red]")
@@ -486,6 +495,9 @@ def sistemAntrean(film_id: str):
 
                     except ValueError:
                         print("[bold red]Masukkan bilangan yang valid![/bold red]")
+
+                if out:
+                    continue
 
                 # Proses pemilihan kursi interaktif
                 ticket_amount, selected_seat, available_seat = orderKursi(

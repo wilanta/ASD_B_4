@@ -149,6 +149,17 @@ def main():
                                 )
                                 continue
 
+                            # Jika terdapat data film yang sama di database dengan yang ditambahkkan, hentikan penambahan film
+                            data_film = getAllData("data_film")
+                            if any(
+                                judul == film["judul_film"]
+                                for film in data_film.values()
+                            ):
+                                console.print(
+                                    "[red]✗ Tidak dapat mengganti judul film[/red]: judul yang sama sudah terdaftar."
+                                )
+                                continue
+
                             # Kuota boleh kosong atau angka 1-60
                             if not kuota_penonton or (
                                 kuota_penonton.isdigit()
