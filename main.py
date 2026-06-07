@@ -210,8 +210,8 @@ def main():
                         "[cyan]Kuota Penonton[/cyan]   \t: "
                     ).strip()
 
-                    # Jika keduanya kosong, anggap user membatalkan
-                    if not judul and not kuota_penonton:
+                    # Jika salah satunya kosong, anggap user membatalkan
+                    if not judul or not kuota_penonton:
                         break
 
                     # Judul tidak boleh mengandung koma (delimiter CSV)
@@ -238,7 +238,13 @@ def main():
                 _processing("Menyimpan film...")
 
                 # Tambah film ke database
-                addFilm(judul, int(kuota_penonton))
+                add_status = addFilm(judul, int(kuota_penonton))
+
+                if not add_status:
+                    console.print(
+                        "[red]✗ Gagal menambahkan film[/red]: judul yang sama sudah terdaftar."
+                    )
+                    input("[Tekan enter untuk kembali]")
 
                 _clear()
 

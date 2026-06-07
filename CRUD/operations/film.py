@@ -189,10 +189,17 @@ def addFilm(judul: str, kuota_penonton: int):
     Args:
         judul (str): Judul film.
         kuota_penonton (int): Kuota/kapasitas penonton.
+
+    Returns:
+        True | None
     """
 
     # Mengambil data dari database agar data baru tidak menimpa data lama
     data_film = getAllData("data_film")
+
+    # Jika terdapat data film yang sama di database dengan yang ditambahkkan, hentikan penambahan film
+    if any(judul == film["judul_film"] for film in data_film.values()):
+        return
 
     # Simpan data terbaru ke dict data_film
     data_film[generateID()] = {
@@ -202,3 +209,5 @@ def addFilm(judul: str, kuota_penonton: int):
 
     # Memanggil fungsi updateData untuk menyimpan data film baru ke file data_film.txt
     updateData(data_dict=data_film, data_name="data_film")
+
+    return True
