@@ -288,8 +288,6 @@ def sistemAntrean(film_id: str):
     if temp_seat_data:
         # available seat loaded from database
         available_seat = list(temp_seat_data[film_id]["available_seat"])
-        # available seat loaded from database
-        available_seat = list(temp_seat_data[film_id]["available_seat"])
 
         # Rekonsiliasi dengan kuota terbaru agar perubahan kuota film
         # (melalui menu Daftar Film -> Update) terpropagasi ke temp_seat.
