@@ -41,7 +41,9 @@ class Ticket:
     # Penjelasan fungsi : Menambahkan record pemesanan baru
     # ke akhir linked list.
     # ------------------------------
-    def addTicket(self, nama, jumlah_tiket, nomor_kursi, urutan_antrean, judul_film):
+    def addTicket(
+        self, nama, jumlah_tiket, nomor_kursi, urutan_antrean, judul_film, customer_id
+    ):
         """
         Menambahkan record pemesanan ke linked list.
 
@@ -54,7 +56,14 @@ class Ticket:
         """
 
         # Membuat node baru
-        new_node = Node(nama, jumlah_tiket, nomor_kursi, urutan_antrean, judul_film)
+        new_node = Node(
+            nama=nama,
+            jumlah_tiket=jumlah_tiket,
+            nomor_kursi=nomor_kursi,
+            urutan_antrean=urutan_antrean,
+            judul_film=judul_film,
+            customer_id=customer_id,
+        )
 
         # Jika list kosong, buatkan head & tail dengan node baru
         if self.isEmpty():

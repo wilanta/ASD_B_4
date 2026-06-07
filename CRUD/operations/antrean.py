@@ -163,7 +163,7 @@ def _load_tickets(judul_film: str, ll: Ticket):
     log = getAllData("temp_log_pemesanan")
 
     # Iterasi semua record dan filter yang sesuai judul_film
-    for record in log.values():
+    for cust_id, record in log.items():
         if record.get("judul") == judul_film:
             kursi_raw = record.get("nomor_kursi")
 
@@ -184,6 +184,7 @@ def _load_tickets(judul_film: str, ll: Ticket):
                 nomor_kursi=nomor_kursi,
                 urutan_antrean=int(record.get("urutan_antrean", 0)),
                 judul_film=record.get("judul", judul_film),
+                customer_id=cust_id,
             )
 
 
@@ -212,29 +213,12 @@ def _save_tickets(judul_film: str, ll: Ticket):
         if data.get("judul") != judul_film
     }
 
-    # Menentukan ID terakhir untuk penomoran ID log baru
-    last_id = 0
-
-    for log_id in temp_log.keys():
-        try:
-            num = int(log_id.replace("LOG", ""))
-
-            if num > last_id:
-                last_id = num
-
-        except:
-            pass
-
     # Traversal linked list
     current = ll.head
 
     while current is not None:
-        # Membuat ID baru dengan format LOG<n>
-        last_id += 1
-        new_log_id = f"LOG{last_id}"
-
         # Menambahkan state terbaru ke temp_log
-        temp_log[new_log_id] = {
+        temp_log[current.customer_id] = {
             "nama": current.nama,
             "jumlah_tiket": str(current.jumlah_tiket),
             "urutan_antrean": str(current.urutan_antrean),
@@ -526,6 +510,9 @@ def sistemAntrean(film_id: str):
                     judul_film=judul_film,
                 )
 
+                # Generate ID log baru untuk entri permanent
+                log_id = generateID()
+
                 # Ambil info customer yang sedang dilayani
                 nama_customer = q.front.nama
                 urutan_antrean = q.front.urutan_antrean
@@ -537,13 +524,11 @@ def sistemAntrean(film_id: str):
                     nomor_kursi=selected_seat,
                     urutan_antrean=urutan_antrean,
                     judul_film=judul_film,
+                    customer_id=log_id,
                 )
 
                 # save permanent log
                 log_pemesanan = getAllData("log_pemesanan")
-
-                # Generate ID log baru untuk entri permanent
-                log_id = generateID()
 
                 log_pemesanan[log_id] = {
                     "nama": nama_customer,
