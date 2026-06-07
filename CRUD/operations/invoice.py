@@ -1,11 +1,14 @@
 """
 ==========================================================
 Invoice
-Mencetak struk berbentuk pdf setelah customer dilayani
+Mencetak struk pembayaran tiket bioskop dalam format PDF
+secata otomatis setelah customer dilayani, lalu membuka
+file PDF tersebut di browser.
 
 Kontributor : M. Lutfi Ramadhan Warendra
+
 Fungsi/fitur:
-1. invoice
+1. invoice - Membuat dan membuka file PDF struk pembayaran
 ==========================================================
 """
 
@@ -20,12 +23,18 @@ from CRUD.utils.seatSort import seat_sort
 
 # ------------------------------
 # Nama fungsi: invoice
-# Penjelasan fungsi : Untuk mencetak struk berbentuk pdf setelah customer dilayani
+# Penjelasan fungsi : Membuat dan membuka file PDF struk pembayaran tiket bioskop
+# secara otomatis setelah customer dilayani.
 # ------------------------------
 def invoice(judul, nama, kursi):
     """
-    Function untuk membuat invoice tiket bioskop dalam bentuk PDF
-    lalu otomatis membuka file tersebut di browser
+    Membuat invoice tiket bioskop dalam format PDF
+    dan otomatis membuka file tersebut di browser.
+
+    Args:
+        judul (str): Judul film yang ditonton.
+        nama (str): Nama customer.
+        kursi (list): List nomor kursi yang dipesan.
     """
 
     # mengambil path direktori tempat file python ini berada
