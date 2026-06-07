@@ -1,18 +1,19 @@
-# Antrean Tiket Bioskop
+# Antrean Tiket Bioskop | TPL2106 B | Algoritma Struktur Data
 
 A Python-based Command Line Interface (CLI) application for managing cinema ticket bookings by ticketing staff.  
 This system implements a Queue to handle customer order processing in a first-come, first-served manner, and a Linked List to efficiently manage booking data
 
-## Team & Role
+## Team & Role | Kelompok 4
 
-- **J0403251040** M. Lutfi Ramadhan Warendra (Engineer, Advisor),
+- **J0403251040** M. Lutfi Ramadhan Warendra (Engineer, Advisor)
 - **J0403251070** Fateeh Falah Hendarto (Engineer, Advisor, QA)
-- **J0403251098** Wildhan Dzikrihantara (Project Manager, Engineer, QA)
+- **J0403251098** Wildhan Dzikrihantara (Project Manager, Engineer)
 
 ## Dependencies
 
-- `pandas` - for visualizing data tables in `pilihFilm` and `showQueue` (`CRUD/operations/queue.py`)
-- `reportlab` - for generating invoice PDFs (`CRUD/operations/invoice.py`)
+- `inquirerpy` - for interactive CLI prompts (`main.py`, `CRUD/operations/film.py`, `CRUD/operations/antrean.py`)
+- `reportlab` - for generating invoice PDFs (`CRUD/operations/invoice.py`, `CRUD/operations/report.py`)
+- `rich` - for formatted console output (`main.py`, `CRUD/operations/*`, `CRUD/utils/*`)
 
 ## How to run
 
@@ -40,7 +41,13 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-- macOS/Linux/Bash:
+- Bash:
+
+```bash
+source venv/Scripts/activate
+```
+
+- macOS/Linux:
 
 ```bash
 source venv/bin/activate
@@ -52,12 +59,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Create the required data files inside the CRUD/data/ directory:
-
-- `data_film.txt`
-- `log_pemesanan.txt`
-
-6. Run the application:
+5. Run the application:
 
 ```bash
 python main.py
