@@ -5,7 +5,7 @@ Aplikasi Command Line Interface (CLI) berbasis Python untuk mengelola pemesanan 
 ## Video & Laporan
 - **Video:**
 
-- **Laporan**
+- **Laporan**<br>
 https://github.com/wilanta/ASD_B_4/blob/master/Laporan_Kelompok4_TPLB_AntreanTiketBioskop.pdf
 
 
