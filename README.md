@@ -1,7 +1,10 @@
 # Antrean Tiket Bioskop | TPL2106 B | Algoritma Struktur Data
 
-A Python-based Command Line Interface (CLI) application for managing cinema ticket bookings by ticketing staff.  
-This system implements a Queue to handle customer order processing in a first-come, first-served manner, and a Linked List to efficiently manage booking data
+Aplikasi Command Line Interface (CLI) berbasis Python untuk mengelola pemesanan tiket bioskop oleh kasir tiket. Sistem ini mengimplementasikan Queue untuk memproses pesanan pelanggan secara pertama masuk pertama keluar, dan Linked List untuk mengelola data pemesanan secara efisien.
+
+## Video & Laporan
+- **Video:**
+- **Laporan:** https://github.com/wilanta/ASD_B_4/blob/master/Laporan_Kelompok 4_TPL B_Antrean Tiket Bioskop.pdf
 
 ## Team & Role | Kelompok 4
 
@@ -11,25 +14,25 @@ This system implements a Queue to handle customer order processing in a first-co
 
 ## Dependencies
 
-- `inquirerpy` - for interactive CLI prompts (`main.py`, `CRUD/operations/film.py`, `CRUD/operations/antrean.py`)
-- `reportlab` - for generating invoice PDFs (`CRUD/operations/invoice.py`, `CRUD/operations/report.py`)
-- `rich` - for formatted console output (`main.py`, `CRUD/operations/*`, `CRUD/utils/*`)
+- `inquirerpy` - untuk prompt CLI interaktif (`main.py`, `CRUD/operations/film.py`, `CRUD/operations/antrean.py`)
+- `reportlab` - untuk membuat PDF struk dan laporan penjualan tiket (`CRUD/operations/invoice.py`, `CRUD/operations/report.py`)
+- `rich` - untuk tampilan console yang terformat (`main.py`, `CRUD/operations/*`, `CRUD/utils/*`)
 
-## How to run
+## Cara Menjalankan
 
-1. Clone this repository or download the ZIP file:
-
-```bash
-git clone https://github.com/wilanta/antrian-tiket-bioskop
-```
-
-2. Navigate to the project directory:
+1. Clone repository ini atau unduh file ZIP:
 
 ```bash
-cd antrian-tiket-bioskop
+git clone https://github.com/wilanta/ASD_B_4.git
 ```
 
-3. Create a virtual environment and activate it:
+2. Masuk ke direktori proyek:
+
+```bash
+cd ASD_B_4-master
+```
+
+3. Buat virtual environment dan aktifkan:
 
 ```bash
 python -m venv venv
@@ -53,13 +56,13 @@ source venv/Scripts/activate
 source venv/bin/activate
 ```
 
-4. Install the required dependencies:
+4. Instal dependensi yang dibutuhkan:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-5. Run the application:
+5. Jalankan aplikasi:
 
 ```bash
 python main.py
