@@ -3,16 +3,17 @@
 Aplikasi Command Line Interface (CLI) berbasis Python untuk mengelola pemesanan tiket bioskop oleh kasir tiket. Sistem ini mengimplementasikan Queue untuk memproses pesanan pelanggan secara pertama masuk pertama keluar, dan Linked List untuk mengelola data pemesanan secara efisien.
 
 ## Video & Laporan
-- **Video:**
+
+- **Video:**<br>
+  https://youtu.be/K5IU5PlDObs?si=4qwvbmFcr4AiSraf
 
 - **Laporan**<br>
-https://github.com/wilanta/ASD_B_4/blob/master/Laporan_Kelompok4_TPLB_AntreanTiketBioskop.pdf
-
+  https://github.com/wilanta/ASD_B_4/blob/master/Laporan_Kelompok4_TPLB_AntreanTiketBioskop.pdf
 
 ## Team & Role | Kelompok 4
 
 - **J0403251040** M. Lutfi Ramadhan Warendra (Engineer, Advisor)
-- **J0403251070** Fateeh Falah Hendarto (Engineer, Advisor, QA)
+- **J0403251070** Fateeh Falah Hendharto (Engineer, Advisor, QA)
 - **J0403251098** Wildhan Dzikrihantara (Project Manager, Engineer)
 
 ## Dependencies
